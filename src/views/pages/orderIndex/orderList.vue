@@ -226,6 +226,7 @@ export default {
     }
   },
   methods:{
+    // 请求页面数据
     search(){
       this.$axios.get('/bi/activity/hau',{
         params: {
@@ -240,8 +241,10 @@ export default {
         console.log(2)
       })
     },
+    
     pageChange(page){
-      console.log(page)
+      this.searchParam.page = page;
+      this.search();
     }
   }
 }

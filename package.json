@@ -17,6 +17,7 @@
     "cheerio": "^1.0.0-rc.2",
     "element-ui": "^2.4.1",
     "fastclick": "^1.0.6",
+    "html2canvas": "^1.0.0-alpha.12",
     "md5": "^2.2.1",
     "normalize.css": "^7.0.0",
     "vue": "^2.3.3",

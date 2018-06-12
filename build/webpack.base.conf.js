@@ -1,3 +1,4 @@
+var webpack = require('webpack')
 var path = require('path')
 var utils = require('./utils')
 var config = require('../config')
@@ -27,7 +28,7 @@ module.exports = {
       'components':resolve('src/components'),
       'view':resolve('src/view'),
       'js':resolve('src/assets/js'),
-      'src': resolve('src')
+      'src': resolve('src'),
     }
   },
   module: {
@@ -76,5 +77,12 @@ module.exports = {
         }
       }
     ]
-  }
+  },
+  plugins:[
+    new webpack.ProvidePlugin({
+    })
+  ]
+    
+  
+  
 }

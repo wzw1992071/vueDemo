@@ -6,13 +6,17 @@ import router from './router'
 import store from "src/vuex/store"
 import axios from "src/api/http"
 
+
+
+
 // 引入饿了么UI组件库
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
 // 引入全局的指令和过滤器
 import directives from "src/directives.js"
-import filters from "src/filters.js"
+import "src/filters.js"
+
 
 Vue.use(ElementUI);
 
