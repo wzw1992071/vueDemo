@@ -1,7 +1,8 @@
 // 销售数据打印页面
 <template>
   <div class="mainBox">
-      {{msg}}
+    <div></div>
+    <div></div>
   </div>
 </template>
 

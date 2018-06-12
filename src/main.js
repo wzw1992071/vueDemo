@@ -7,7 +7,8 @@ import store from "src/vuex/store"
 import axios from "src/api/http"
 
 
-
+//初始化css样式
+import "src/assets/css/normalize.css"
 
 // 引入饿了么UI组件库
 import ElementUI from 'element-ui';
