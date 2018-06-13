@@ -135,7 +135,9 @@
   </div>
 </template>
 
+
 <script>
+
 export default {
   name: 'OrderList',
   data () {
@@ -206,7 +208,7 @@ export default {
           delete sendParam[i];
         }
       }
-      this.$axios.get('/provider/allocate/order/list',sendParam)
+      this.$axios.get('/provider/allocate/order/list',{params: sendParam})
       .then(function(r){
         console.log(r)
         if(r.data.length>0){
