@@ -4,20 +4,9 @@
     <!-- 搜索条件 -->
       <div class="searchArea">
         <div>
-          <span>订单类型：</span>
-          <el-select v-model="searchParam.orderType" placeholder="请选择">
-            <el-option
-              v-for="item in selectOptions.orderTypes"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </div>
-        <div>
           <div class="block">
             <el-date-picker
-              v-model="searchParam.startTime"
+              v-model="searchParam.start_date"
               type="date"
               placeholder="开始日期">
             </el-date-picker>
@@ -25,7 +14,7 @@
           <div class="line">至</div>
           <div class="block">
             <el-date-picker
-              v-model="searchParam.endTime"
+              v-model="searchParam.end_date"
               type="date"
               placeholder="结束日期">
             </el-date-picker>
@@ -33,11 +22,7 @@
         </div>
         <div class="demo-input-suffix">
           <span>客户：</span>  
-          <el-input v-model="searchParam.customerName"></el-input>
-        </div>
-        <div class="demo-input-suffix">
-          <span>商品名：</span>  
-          <el-input v-model="searchParam.goodsName"></el-input>
+          <el-input v-model="searchParam.buyer"></el-input>
         </div>
       </div>
       <!-- 搜索按钮 -->
@@ -49,51 +34,93 @@
         <el-table
           :data="tableData"
           :stripe=true
+          height="150"
+          border
           align="center"
           >
-           <el-table-column
-            prop="index"
+          <el-table-column
             label="序号"
+            type="index"
             align="center"
-            width="80">
+            width="50">
           </el-table-column>
           <el-table-column
-            prop="date"
-            label="日期"
-            min-width="150"
-            align="center">
-          </el-table-column>
-          <el-table-column
-            prop="name"
-            label="姓名"
+            prop="order_no"
+            label="订单号"
             min-width="120"
             align="center">
           </el-table-column>
-          <el-table-column label="地址" align="center">
+          <el-table-column
+            prop="consign_date"
+            label="送货时间"
+            min-width="120"
+            align="center">
+          </el-table-column>
+          <el-table-column
+            prop="buyer_shop_name"
+            label="店铺名称"
+            min-width="120"
+            align="center">
+          </el-table-column>
+          <el-table-column
+            prop="buyer_tel"
+            label="客户电话"
+            min-width="120"
+            align="center">
+          </el-table-column>
             <el-table-column
-              prop="province"
-              label="省份"
-              align="center"
-              min-width="120">
-            </el-table-column>
+            prop="receipt_address"
+            label="地址"
+            min-width="200"
+            align="center">
+          </el-table-column>
             <el-table-column
-              prop="city"
-              label="市区"
-              align="center"
-              min-width="120">
-            </el-table-column>
+            prop="pay_mode"
+            label="付款方式"
+            min-width="100"
+            align="center">
+          </el-table-column>
             <el-table-column
-              prop="address"
-              label="地址"
-              align="center"
-              min-width="300">
-            </el-table-column>
+            prop="buy_num"
+            label="购买总数"
+            min-width="100"
+            align="center">
+          </el-table-column>
             <el-table-column
-              prop="zip"
-              label="邮编"
-              align="center"
-              min-width="120">
-            </el-table-column>
+            prop="total_amount"
+            label="商品金额"
+            min-width="100"
+            align="center">
+          </el-table-column>
+            <el-table-column
+            prop="receipt_area_code"
+            label="配送区域"
+            min-width="200"
+            align="center">
+          </el-table-column>
+          <el-table-column
+            fixed="right"
+            label="操作"
+            align="center"
+            width="120">
+            <template slot-scope="scope">
+              <el-popover
+                placement="left"
+                width="1200"
+                trigger="click">
+                <el-table :data="goodsInfo" border>
+                  <el-table-column label="序号" type="index" align="center" width="50"></el-table-column>
+                  <el-table-column min-width="150" align="center" property="goods_name" label="品名"></el-table-column>
+                  <el-table-column min-width="100" align="center" property="goods_sell_price" label="单价"></el-table-column>
+                  <el-table-column min-width="100" align="center" property="buy_num" label="数量"></el-table-column>
+                  <el-table-column min-width="100" align="center" property="sell_unit" label="单位"></el-table-column>
+                  <el-table-column min-width="150" align="center" property="goods_number" label="商品编号"></el-table-column>
+                  <el-table-column min-width="200" align="center" property="seller_shop" label="供应商名称"></el-table-column>
+                  <el-table-column min-width="200" align="center" property="seller_tel" label="供应商电话"></el-table-column>
+                </el-table>
+                <el-button slot="reference" @click.native.prevent="getNowGoods(scope.$index, tableData)">订单详情</el-button>
+              </el-popover>
+            </template>
           </el-table-column>
         </el-table>
       </div>
@@ -102,7 +129,7 @@
             background
             layout="prev, pager, next"
             @current-change="pageChange"
-            :total="50">
+            :total="dataTotal">
           </el-pagination>
       </div>
   </div>
@@ -115,14 +142,13 @@ export default {
     return {
       // 搜索条件
       searchParam:{
-        orderType:'',//订单类型
-        startTime:'',//开始时间
-        endTimeL:'',//结束时间
-        customerName:'',//客户名
-        goodsName:'',//商品名称
+        start_date:'',//开始时间
+        end_date:'',//结束时间
+        buyer:'',//客户名
         page:'1',//当前页
-        pageSize:'10'//每页数量
+        size:'10'//每页数量
       },
+      dataTotal:50,
       // 下拉框属性
       selectOptions:{
         orderTypes:[
@@ -133,118 +159,74 @@ export default {
       // 表格数据
       tableData:[
         {
-          index:'1',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
+          "id":1,
+          "order_no":"订单编号",
+          "consign_date":"送货日期 Y-m-d 如：2016-06-11",
+          "buyer_shop_name":"采购商店铺名",
+          "buyer_tel":"1234562",
+          "receipt_address":"收货地址",
+          "pay_mode":"货到付款",
+          "buy_num":10,
+          "total_amount":1000,
+          "receipt_area_code":"Y_2",
+          "goods":[
+              {
+                  "goods_name":"2222",
+                  "goods_sell_price":123,
+                  "buy_num":1234,
+                  "sell_unit":"件",
+                  "goods_number":"554214",
+                  "seller_shop":"打啊打大大打",
+                  "seller_tel":"13502106110"
+              },
+              {
+                  "goods_name":"2313132",
+                  "goods_sell_price":13,
+                  "buy_num":1234,
+                  "sell_unit":"件",
+                  "goods_number":"554214",
+                  "seller_shop":"大大打",
+                  "seller_tel":"13502106110"
+              }
+          ]
         },
-        {
-          index:'2',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          index:'3',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          index:'4',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          index:'5',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          index:'6',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          index:'7',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          index:'8',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          index:'9',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          index:'10',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        }
-      ]
+      ],
+      // 弹出框订单详情数据
+      goodsInfo:[]
     }
   },
+
   methods:{
     // 请求页面数据
     search(){
-      this.$axios.get('/bi/activity/hau',{
-        params: {
-          start_date: "2018-06-11",
-          end_date: "2018-06-11"
+      let sendParamStr = JSON.stringify(this.searchParam)
+      let sendParam = JSON.parse(sendParamStr)
+      for(var i in sendParam ){
+        if(!sendParam[i]){
+          delete sendParam[i];
+        }
+      }
+      this.$axios.get('/provider/allocate/order/list',sendParam)
+      .then(function(r){
+        console.log(r)
+        if(r.data.length>0){
+          // this.tableData=
+        }else{
+
         }
       })
-      .then(function(){
-        console.log(1)
-      })
       .catch(function(){
-        console.log(2)
+        console.log("获取数据失败")
       })
     },
-    
+    // 页面跳转
     pageChange(page){
       this.searchParam.page = page;
       this.search();
+    },
+    // 获取当前行的订单详情
+    getNowGoods(index, rows) {
+      this.goodsInfo = rows[index].goods
     }
   }
 }
@@ -259,7 +241,7 @@ export default {
       margin: 0 10px 10px;
       padding: 15px 0;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       &>div{
         display: flex;
         justify-content: space-between;
