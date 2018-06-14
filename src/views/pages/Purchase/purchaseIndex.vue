@@ -159,7 +159,7 @@
           </el-table-column>
           <el-table-column
             fixed="right"
-            label="修改"
+            label="操作"
             align="center"
             width="80">
               <template slot-scope="scope">
@@ -356,7 +356,7 @@ export default {
               r.data.data.goods[i].purchases_modeName=that.selectData.purchases_mode[j].name
             }
           }
-          for(var j=0;j<that.selectData.purchases_mode.length;j++){
+          for(var j=0;j<that.selectData.status.length;j++){
             if(that.selectData.status[j].id==r.data.data.goods[i].status){
               r.data.data.goods[i].statusName=that.selectData.status[j].name
             }
