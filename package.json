@@ -11,7 +11,7 @@
     "lint": "eslint --ext .js,.vue src"
   },
   "dependencies": {
-    "axios": "^0.16.2",
+    "axios": "^0.18.0",
     "babel-plugin-transform-es2015-unicode-regex": "^6.24.1",
     "body-parser": "^1.17.2",
     "cheerio": "^1.0.0-rc.2",
