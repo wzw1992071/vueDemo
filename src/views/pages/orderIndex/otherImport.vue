@@ -34,6 +34,10 @@
       <div class="btnGuoup">
           <el-button type="primary" icon="el-icon-tickets" @click="importOrder">导入</el-button>
       </div>
+
+      <div>
+        <iframe  class="importIframe" :src="importAdd"></iframe>
+      </div>
   </div>
 </template>
 
@@ -63,33 +67,28 @@ export default {
         sp_id:'',//客户名
         status:[]//选中状态
       },
+      importAdd:''
     }
   },
   methods:{
     importOrder(){
       var that= this;
       // 判断条件是否正确
-      if(this.entryParam.begin&&this.entryParam.end&&this.entryParam.sp_id&&(this.entryParam.status.length!=0)){
+      if(this.entryParam.begin&&this.entryParam.end){
         if(this.entryParam.begin>this.entryParam.end){
           that.$message.error('请选择正确的时间');
           return false;
         }else{
-          var sendData = {};
-          sendData.begin =$tools.dateFormat(that.entryParam.begin);
-          sendData.end = $tools.dateFormat(that.entryParam.end)
-          sendData.sp_id = that.entryParam.sp_id
-          // sendData.status = that.entryParam.status
+          var hashParam = `begin=${$tools.dateFormat(that.entryParam.begin)}&end=${$tools.dateFormat(that.entryParam.end)}`;
+          if(that.entryParam.sp_id){
+            hashParam+=(`&sp_id=${that.entryParam.sp_id}`)
+          }
+          if(that.entryParam.status.length>0){
+            hashParam+=(`&status=${that.entryParam.status.join(',')}`)
+          }
+        
         }
-        console.log(sendData)
-        // 导入逻辑
-        that.$axios.get('/provider/order/gen/allocate-cargo',{params: sendData})
-        .then(function(r){
-          that.$message('导入成功');
-        })
-        .catch(function(){
-          that.$message.error('导入失败');
-          return false;
-        })
+        that.importAdd=(`${window.location.origin}/api/provider/order/gen/allocate-cargo?${hashParam}`)
       }else{
         that.$message.error('请完善导入条件');
         return false;
@@ -135,6 +134,9 @@ export default {
       justify-content: flex-start; 
       margin: 0 10px 10px;     
       padding-bottom: 10px;
+    }
+    .importIframe{
+      border: 0
     }
   }
 </style>

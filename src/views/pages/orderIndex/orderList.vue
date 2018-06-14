@@ -34,7 +34,7 @@
         <el-table
           :data="tableData"
           :stripe=true
-          height="150"
+          max-height="800"
           border
           align="center"
           >
@@ -108,7 +108,7 @@
                 placement="left"
                 width="1200"
                 trigger="click">
-                <el-table :data="goodsInfo" border>
+                <el-table :data="goodsInfo" border max-height="500">
                   <el-table-column label="序号" type="index" align="center" width="50"></el-table-column>
                   <el-table-column min-width="150" align="center" property="goods_name" label="品名"></el-table-column>
                   <el-table-column min-width="100" align="center" property="goods_sell_price" label="单价"></el-table-column>
@@ -137,7 +137,7 @@
 
 
 <script>
-
+import '../../../tool.js'
 export default {
   name: 'OrderList',
   data () {
@@ -150,7 +150,7 @@ export default {
         page:'1',//当前页
         size:'10'//每页数量
       },
-      dataTotal:50,
+      dataTotal:0,
       // 下拉框属性
       selectOptions:{
         orderTypes:[
@@ -160,38 +160,7 @@ export default {
       },
       // 表格数据
       tableData:[
-        {
-          "id":1,
-          "order_no":"订单编号",
-          "consign_date":"送货日期 Y-m-d 如：2016-06-11",
-          "buyer_shop_name":"采购商店铺名",
-          "buyer_tel":"1234562",
-          "receipt_address":"收货地址",
-          "pay_mode":"货到付款",
-          "buy_num":10,
-          "total_amount":1000,
-          "receipt_area_code":"Y_2",
-          "goods":[
-              {
-                  "goods_name":"2222",
-                  "goods_sell_price":123,
-                  "buy_num":1234,
-                  "sell_unit":"件",
-                  "goods_number":"554214",
-                  "seller_shop":"打啊打大大打",
-                  "seller_tel":"13502106110"
-              },
-              {
-                  "goods_name":"2313132",
-                  "goods_sell_price":13,
-                  "buy_num":1234,
-                  "sell_unit":"件",
-                  "goods_number":"554214",
-                  "seller_shop":"大大打",
-                  "seller_tel":"13502106110"
-              }
-          ]
-        },
+       
       ],
       // 弹出框订单详情数据
       goodsInfo:[]
@@ -201,8 +170,15 @@ export default {
   methods:{
     // 请求页面数据
     search(){
+      var that= this
       let sendParamStr = JSON.stringify(this.searchParam)
       let sendParam = JSON.parse(sendParamStr)
+      if(sendParam.start_date){
+        sendParam.start_date=$tools.dateFormat(sendParam.start_date)
+      }
+      if(sendParam.end_date){
+        sendParam.end_date=$tools.dateFormat(sendParam.end_date)
+      }
       for(var i in sendParam ){
         if(!sendParam[i]){
           delete sendParam[i];
@@ -210,12 +186,8 @@ export default {
       }
       this.$axios.get('/provider/allocate/order/list',{params: sendParam})
       .then(function(r){
-        console.log(r)
-        if(r.data.length>0){
-          // this.tableData=
-        }else{
-
-        }
+        that.tableData = r.data.data.orders
+        that.dataTotal = r.data.data.total
       })
       .catch(function(){
         console.log("获取数据失败")
@@ -230,6 +202,9 @@ export default {
     getNowGoods(index, rows) {
       this.goodsInfo = rows[index].goods
     }
+  },
+  created(){
+    this.search()
   }
 }
 </script>
