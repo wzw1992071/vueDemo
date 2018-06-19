@@ -235,6 +235,8 @@ export default {
       },
       // 表格数据
       tableData:[],
+      // 总数
+      dataTotal:0,
       // 复选框中的项
       multipleSelection: [],
       selectData:{

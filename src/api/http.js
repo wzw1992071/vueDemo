@@ -31,7 +31,8 @@ axios.interceptors.response.use(function(res){
   //在这里对返回的数据进行处理
   loadinginstace.close();
   // 对登陆超时进行处理
-  if(res.code == 10106){
+  console.log(res)
+  if(res.data.code == 10106){
     MessageBox.alert('登陆超时', '提示',{
       confirmButtonText: '确定',
       callback: action => {
