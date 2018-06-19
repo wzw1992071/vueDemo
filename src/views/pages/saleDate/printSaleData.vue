@@ -67,43 +67,84 @@
             width="80">
           </el-table-column>
           <el-table-column
-            prop="date"
-            label="日期"
-            min-width="150"
-            align="center">
-          </el-table-column>
-          <el-table-column
-            prop="name"
-            label="姓名"
+            prop="order_no"
+            label="订单号"
             min-width="120"
             align="center">
           </el-table-column>
-          <el-table-column label="地址" align="center">
-            <el-table-column
-              prop="province"
-              label="省份"
-              align="center"
-              min-width="120">
-            </el-table-column>
-            <el-table-column
-              prop="city"
-              label="市区"
-              align="center"
-              min-width="120">
-            </el-table-column>
-            <el-table-column
-              prop="address"
-              label="地址"
-              align="center"
-              min-width="300">
-            </el-table-column>
-            <el-table-column
-              prop="zip"
-              label="邮编"
-              align="center"
-              min-width="120">
-            </el-table-column>
+          <el-table-column
+            prop="consign_date"
+            label="送货时间"
+            min-width="120"
+            align="center">
           </el-table-column>
+          <el-table-column
+            prop="buyer_shop_name"
+            label="店铺名称"
+            min-width="120"
+            align="center">
+          </el-table-column>
+          <el-table-column
+            prop="buyer_tel"
+            label="客户电话"
+            min-width="120"
+            align="center">
+          </el-table-column>
+            <el-table-column
+            prop="receipt_address"
+            label="地址"
+            min-width="200"
+            align="center">
+          </el-table-column>
+            <el-table-column
+            prop="pay_mode"
+            label="付款方式"
+            min-width="100"
+            align="center">
+          </el-table-column>
+            <el-table-column
+            prop="buy_num"
+            label="购买总数"
+            min-width="100"
+            align="center">
+          </el-table-column>
+            <el-table-column
+            prop="total_amount"
+            label="商品金额"
+            min-width="100"
+            align="center">
+          </el-table-column>
+            <el-table-column
+            prop="receipt_area_code"
+            label="配送区域"
+            min-width="200"
+            align="center">
+          </el-table-column>
+          <el-table-column
+            fixed="right"
+            label="操作"
+            align="center"
+            width="120">
+            <template slot-scope="scope">
+              <el-popover
+                placement="left"
+                width="1200"
+                trigger="click">
+                <el-table :data="goodsInfo" border max-height="500">
+                  <el-table-column label="序号" type="index" align="center" width="50"></el-table-column>
+                  <el-table-column min-width="150" align="center" property="goods_name" label="品名"></el-table-column>
+                  <el-table-column min-width="100" align="center" property="goods_sell_price" label="单价"></el-table-column>
+                  <el-table-column min-width="100" align="center" property="buy_num" label="数量"></el-table-column>
+                  <el-table-column min-width="100" align="center" property="sell_unit" label="单位"></el-table-column>
+                  <el-table-column min-width="150" align="center" property="goods_number" label="商品编号"></el-table-column>
+                  <el-table-column min-width="200" align="center" property="seller_shop" label="供应商名称"></el-table-column>
+                  <el-table-column min-width="200" align="center" property="seller_tel" label="供应商电话"></el-table-column>
+                </el-table>
+                <el-button slot="reference" @click.native.prevent="getNowGoods(scope.$index, tableData)">订单详情</el-button>
+              </el-popover>
+            </template>
+          </el-table-column>
+          
         </el-table>
       </div>
       <div class="pageControl">
@@ -143,96 +184,6 @@ export default {
       },
       // 表格数据
       tableData:[
-        {
-          index:'1',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          index:'2',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          index:'3',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          index:'4',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          index:'5',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          index:'6',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          index:'7',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          index:'8',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          index:'9',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        },
-        {
-          index:'10',
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        }
       ],
       // 复选框中的项
       multipleSelection: []

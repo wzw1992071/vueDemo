@@ -10,7 +10,7 @@ export default {
   name: 'Logisticsed',
   data () {
     return {
-      msg: '发送物流单页面'
+      msg: '开发中，敬请期待'
     }
   }
 }

@@ -55,6 +55,12 @@
             align="center"
             width="50">
           </el-table-column>
+           <el-table-column
+            prop="purchases_date"
+            label="订单日期"
+            min-width="150"
+            align="center">
+          </el-table-column>
           <el-table-column
             prop="seller_shop"
             label="卖家名称"
@@ -166,11 +172,53 @@
           <el-button @click="dialogFormVisible2 = false">取 消</el-button> 
         </div>
       </el-dialog>
+
+      <!-- 打印区域 -->
+      <div id="printArea" v-if="printShow">
+        <div class="pdfMian" id="pdfMian">
+            <div class="onePage" v-for="item in printDatas" :key="item.id">
+            <el-row>
+              <el-col :span="16"><div class="grid-content">
+                <span>客户名：</span><span>{{item.buyer_shop_name}}</span>
+              </div></el-col>
+              <el-col :span="8"><div class="grid-content">
+                <span>编号：</span><span>{{item.goods_number}}</span>
+              </div></el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="6"><div class="grid-content">
+                <span>{{item.purchases_num}}</span><span>{{item.sell_unit}}</span>
+              </div></el-col>
+              <el-col :span="18"><div class="grid-content">
+                <span>{{item.goods_name}}</span>
+              </div></el-col>
+            </el-row>
+            <div>
+              <span>合计总数：</span><span>{{item.total_num}}</span>
+            </div>
+             <el-row>
+              <el-col :span="12"><div class="grid-content">
+                <span>{{item.receipt_area_code}}</span>
+              </div></el-col>
+              <el-col :span="12"><div class="grid-content">
+                <span>{{item.purchases_date}}</span>
+              </div></el-col>
+            </el-row>
+          </div>
+        </div>
+        <!-- <div class="pdfbox" id="pdfbox">
+          
+        </div>
+        <div class="printButton">
+          <el-button type="primary" @click="printPDF">打印</el-button>
+        </div> -->
+      </div>
   </div>
 </template>
 
 <script>
 import '../../../tool.js'
+import html2canvas from "html2canvas"
 export default {
   name: 'CollectGoodsIndex',
   data () {
@@ -200,7 +248,10 @@ export default {
         id:'',
         brand:'',
         acceptance_num:''
-      }
+      },
+      printShow:false,
+      printDatas:[
+      ], 
     }
   },
   methods:{
@@ -257,8 +308,43 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
+    // 批量打印
     morePrint(){
-      console.log(this.multipleSelection)
+      if(this.multipleSelection.length==0){
+        this.$message({
+          message: '请选择商品',
+          type: 'warning'
+        });
+        return false;
+      }
+      var that= this;
+      this.printShow=true;
+      var choiceGoodIds = [];
+      for(var i =0;i<this.multipleSelection.length;i++){
+        choiceGoodIds.push(this.multipleSelection[i].id)
+      }
+      this.$axios.get("/provider/purchases/print/lists",{
+        params:{ids:choiceGoodIds}
+      }).then(function(r){
+        that.printDatas=r.data.data;
+        html2canvas(document.querySelector("#pdfMian"),{
+            width:400
+        }).then(canvas => {
+            var bdHtml = document.body.innerHTML;
+            document.body.innerHTML="";
+            window.document.body.appendChild(canvas)
+            window.print();
+            document.body.innerHTML=bdHtml
+            // document.querySelector("#pdfbox").appendChild(canvas)
+        });
+      }).catch(function(){
+        that.$message.error({
+          message: '获取打印数据失败',
+        });
+      })
+    },
+    printPDF(){
+
     },
     // 弹出修改品牌
     editInfo1(data){
@@ -383,6 +469,38 @@ export default {
           padding-right:15px ;
           line-height: 40px;
         }
+      }
+    }
+    // 打印样式
+    #printArea{
+      position: fixed;
+      z-index:500;
+      width: 600px;
+      left: 50%;
+      top: 20%;
+      transform: translate(-340px);
+      max-height: 600px;
+      overflow: scroll;
+      background: #fff;
+      .pdfMian{
+        position: absolute;
+        left: -9999px;
+        top:-9999px;
+        .onePage{
+          font-size: 18px;
+          height: 240px;
+          margin: 10px 15px;
+          .el-row{
+            margin: 40px 0;
+          }
+        }
+      }
+      .pdfbox{
+        // display: none;
+      }
+      .printButton{
+        text-align: center;
+        margin:20px;
       }
     }
   }
