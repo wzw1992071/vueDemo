@@ -4,20 +4,9 @@
     <!-- 搜索条件 -->
       <div class="searchArea">
         <div>
-          <span>订单类型：</span>
-          <el-select v-model="searchParam.orderType" placeholder="请选择">
-            <el-option
-              v-for="item in selectOptions.orderTypes"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </div>
-        <div>
           <div class="block">
             <el-date-picker
-              v-model="searchParam.startTime"
+              v-model="searchParam.start_date"
               type="date"
               placeholder="开始日期">
             </el-date-picker>
@@ -25,7 +14,7 @@
           <div class="line">至</div>
           <div class="block">
             <el-date-picker
-              v-model="searchParam.endTime"
+              v-model="searchParam.end_date"
               type="date"
               placeholder="结束日期">
             </el-date-picker>
@@ -33,11 +22,11 @@
         </div>
         <div class="demo-input-suffix">
           <span>客户：</span>  
-          <el-input v-model="searchParam.customerName"></el-input>
+          <el-input v-model="searchParam.buyer"></el-input>
         </div>
         <div class="demo-input-suffix">
           <span>商品名：</span>  
-          <el-input v-model="searchParam.goodsName"></el-input>
+          <el-input v-model="searchParam.goods_name"></el-input>
         </div>
       </div>
       <!-- 搜索按钮 -->
@@ -160,27 +149,22 @@
 
 
 <script>
-import html2canvas from 'html2canvas'
 export default {
   name: 'PrintSaleData',
   data () {
     return {
       // 搜索条件
       searchParam:{
-        orderType:'',//订单类型
-        startTime:'',//开始时间
-        endTimeL:'',//结束时间
-        customerName:'',//客户名
-        goodsName:'',//商品名称
+        start_date:'',//开始时间
+        end_date:'',//结束时间
+        buyer:'',//客户名
+        goods_name:'',//商品名称
         page:'1',//当前页
-        pageSize:'10'//每页数量
+        size:'10'//每页数量
       },
       // 下拉框属性
       selectOptions:{
-        orderTypes:[
-          { value: '0',label: '全部订单'},
-          { value: '1',label: '未完成'},
-        ]
+        
       },
       // 表格数据
       tableData:[
@@ -192,18 +176,7 @@ export default {
   methods:{
     // 请求页面数据
     search(){
-      this.$axios.get('/bi/activity/hau',{
-        params: {
-          start_date: "2018-06-11",
-          end_date: "2018-06-11"
-        }
-      })
-      .then(function(){
-        console.log(1)
-      })
-      .catch(function(){
-        console.log(2)
-      })
+     console.log(1)
     },
     // 页面改变触发重新搜索
     pageChange(page){
@@ -230,14 +203,14 @@ export default {
       margin: 0 10px 10px;
       padding: 15px 0;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       &>div{
         display: flex;
         justify-content: space-between;
         span{
           text-align: right;
           line-height: 42px;
-          min-width: 65px;
+          min-width: 95px;
         }
         .line{
           text-align: center;

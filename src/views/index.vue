@@ -32,7 +32,7 @@ export default {
     return {
     }
   },
-  mouted () {
+  mounted () {
     // console.log(1)
     // 如果为本地，模拟登陆获取token
     if(window.location.hostname=="localhost"){
