@@ -1,6 +1,5 @@
 // 引入饿了么UI组件库中的message和load
-import {Loading, Message} from 'element-ui'
-
+import {Loading, Message, MessageBox} from 'element-ui'
 import Axios from 'axios'
 
 var axios = Axios.create({
@@ -31,6 +30,15 @@ axios.interceptors.request.use(function(config){
 axios.interceptors.response.use(function(res){
   //在这里对返回的数据进行处理
   loadinginstace.close();
+  // 对登陆超时进行处理
+  if(res.code == 10106){
+    MessageBox.alert('登陆超时', '提示',{
+      confirmButtonText: '确定',
+      callback: action => {
+        window.location.href="/"
+      }
+    })
+  }
   return res;
 },function(err){
   //Do something with response error

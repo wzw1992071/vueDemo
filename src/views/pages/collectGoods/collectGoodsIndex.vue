@@ -38,6 +38,7 @@
       <!-- 表单 -->
       <div class="tableArea">
         <el-table
+          border
           ref="multipleTable"
           tooltip-effect="dark"
           :data="tableData"
@@ -138,7 +139,7 @@
             background
             layout="prev, pager, next"
             @current-change="pageChange"
-            :total="50">
+            :total="dataTotal">
           </el-pagination>
       </div>
 

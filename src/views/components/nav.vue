@@ -96,8 +96,8 @@ export default {
                     childs:[
                         {index:"1-1",  name:"订单列表" ,path:"/orderList"},
                         {index:"1-2",  name:"冻参谋导入",path:"/otherImport"},
-                        {index:"1-3",  name:"手动加单",path:"/orderHandAdd"},
-                        {index:"1-4",  name:"订单导出",path:"/orderExport"},
+                        // {index:"1-3",  name:"手动加单",path:"/orderHandAdd"},
+                        // {index:"1-4",  name:"订单导出",path:"/orderExport"},
                     ]
                 },
                 { 
@@ -105,7 +105,7 @@ export default {
                     name:"采购首页",
                     childs:[
                         {index:"2-1",  name:"采购页面" ,path:"/PurchaseIndex"},
-                        {index:"2-2",  name:"供应商修改页面",path:"/supplierRevise"}
+                        // {index:"2-2",  name:"供应商修改页面",path:"/supplierRevise"}
                     ]
                 },
                 { 
@@ -121,14 +121,14 @@ export default {
                     childs:[
                         {index:"4-1",  name:"销售单打印" ,path:"/printSaleData"}
                     ]
-                },
-                { 
-                    index:"5",  
-                    name:"物流配送单",
-                    childs:[
-                        {index:"5-1",  name:"发送物流单" ,path:"/logisticsed"}
-                    ]
                 }
+                // ,{ 
+                //     index:"5",  
+                //     name:"物流配送单",
+                //     childs:[
+                //         {index:"5-1",  name:"发送物流单" ,path:"/logisticsed"}
+                //     ]
+                // }
         ]
     }
   },

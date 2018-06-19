@@ -21,13 +21,13 @@
           </div>
         </div>
         <div class="demo-input-suffix">
-          <span>客户：</span>  
+          <span>店铺名：</span>  
           <el-input v-model="searchParam.buyer"></el-input>
         </div>
-        <div class="demo-input-suffix">
+        <!-- <div class="demo-input-suffix">
           <span>商品名：</span>  
           <el-input v-model="searchParam.goods_name"></el-input>
-        </div>
+        </div> -->
       </div>
       <!-- 搜索按钮 -->
       <div class="btnGuoup">
@@ -38,19 +38,20 @@
       <!-- 表单 -->
       <div class="tableArea">
         <el-table
-          ref="multipleTable"
-          tooltip-effect="dark"
           :data="tableData"
           :stripe=true
+          max-height="800"
+          border
           align="center"
+          ref="multipleTable"
           @selection-change="handleSelectionChange"
           >
           <el-table-column
             type="selection"
             width="55">
           </el-table-column>
-           <el-table-column
-            prop="index"
+          <el-table-column
+            type="index"
             label="序号"
             align="center"
             width="80">
@@ -58,11 +59,11 @@
           <el-table-column
             prop="order_no"
             label="订单号"
-            min-width="120"
+            min-width="200"
             align="center">
           </el-table-column>
           <el-table-column
-            prop="consign_date"
+            prop="purchases_date"
             label="送货时间"
             min-width="120"
             align="center">
@@ -92,13 +93,13 @@
             align="center">
           </el-table-column>
             <el-table-column
-            prop="buy_num"
+            prop="total_num"
             label="购买总数"
             min-width="100"
             align="center">
           </el-table-column>
             <el-table-column
-            prop="total_amount"
+            prop="total_money"
             label="商品金额"
             min-width="100"
             align="center">
@@ -123,7 +124,7 @@
                   <el-table-column label="序号" type="index" align="center" width="50"></el-table-column>
                   <el-table-column min-width="150" align="center" property="goods_name" label="品名"></el-table-column>
                   <el-table-column min-width="100" align="center" property="goods_sell_price" label="单价"></el-table-column>
-                  <el-table-column min-width="100" align="center" property="buy_num" label="数量"></el-table-column>
+                  <el-table-column min-width="100" align="center" property="acceptance_num" label="数量"></el-table-column>
                   <el-table-column min-width="100" align="center" property="sell_unit" label="单位"></el-table-column>
                   <el-table-column min-width="150" align="center" property="goods_number" label="商品编号"></el-table-column>
                   <el-table-column min-width="200" align="center" property="seller_shop" label="供应商名称"></el-table-column>
@@ -141,7 +142,7 @@
             background
             layout="prev, pager, next"
             @current-change="pageChange"
-            :total="50">
+            :total="dataTotal">
           </el-pagination>
       </div>
   </div>
@@ -169,6 +170,8 @@ export default {
       // 表格数据
       tableData:[
       ],
+       // 弹出框订单详情数据
+      goodsInfo:[],
       // 复选框中的项
       multipleSelection: []
     }
@@ -176,7 +179,33 @@ export default {
   methods:{
     // 请求页面数据
     search(){
-     console.log(1)
+      console.log(1)
+      var that= this
+      let sendParamStr = JSON.stringify(this.searchParam)
+      let sendParam = JSON.parse(sendParamStr)
+      if(sendParam.start_date){
+        sendParam.start_date=$tools.dateFormat(sendParam.start_date)
+      }
+      if(sendParam.end_date){
+        sendParam.end_date=$tools.dateFormat(sendParam.end_date)
+      }
+      for(var i in sendParam ){
+        if(!sendParam[i]){
+          delete sendParam[i];
+        }
+      }
+      this.$axios.get('/provider/purchases/sales/list',{params: sendParam})
+      .then(function(r){
+        var data = [];
+        for(var i = 0;i<r.data.data.orders.length;i++){
+          data.push(r.data.data.orders[i].order)
+        }
+        that.tableData = data
+        that.dataTotal = r.data.data.total
+      })
+      .catch(function(){
+        console.log("获取数据失败")
+      })
     },
     // 页面改变触发重新搜索
     pageChange(page){
@@ -187,9 +216,17 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
+    // 获取当前行的订单详情
+    getNowGoods(index, rows) {
+      this.goodsInfo = rows[index].goods
+    },
     morePrint(){
       console.log(this.multipleSelection)
-    }
+    },
+    
+  },
+  created(){
+    this.search()
   }
 }
 </script>
