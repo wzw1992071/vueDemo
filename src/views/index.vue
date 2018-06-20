@@ -46,6 +46,15 @@ export default {
           console.log("登陆失败，请重新登陆")
       })
     }
+    // 保存本地打印机设置(暂时写死，没有打印机配置)
+    let printConfig = {
+        waybillPrinter: 'Microsoft XPS Document Writer',
+        tagPrinter: 'Microsoft XPS Document Writer',
+        billPrinter: 'Microsoft XPS Document Writer',
+        driverPrinter: 'Microsoft XPS Document Writer',
+        labelPrinter: 'Microsoft XPS Document Writer'
+    };
+    localStorage.setItem('print', JSON.stringify(printConfig));
   }
 
 

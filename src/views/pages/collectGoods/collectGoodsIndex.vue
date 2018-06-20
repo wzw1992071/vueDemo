@@ -126,8 +126,9 @@
             fixed="right"
             label="操作"
             align="center"
-            width="220">
+            width="250">
               <template slot-scope="scope">
+                <el-button @click="sureGood(scope.row)" type="text" size="small">确认收货</el-button>
                 <el-button @click="editInfo1(scope.row)" type="text" size="small">修改货物品牌</el-button>
                 <el-button @click="editInfo2(scope.row)" type="text" size="small">修改收货数量</el-button>
               </template>
@@ -174,52 +175,19 @@
         </div>
       </el-dialog>
 
-      <!-- 打印区域 -->
-      <div id="printArea" v-if="printShow">
-        <div class="pdfMian" id="pdfMian">
-            <div class="onePage" v-for="item in printDatas" :key="item.id">
-            <el-row>
-              <el-col :span="16"><div class="grid-content">
-                <span>客户名：</span><span>{{item.buyer_shop_name}}</span>
-              </div></el-col>
-              <el-col :span="8"><div class="grid-content">
-                <span>编号：</span><span>{{item.goods_number}}</span>
-              </div></el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="6"><div class="grid-content">
-                <span>{{item.purchases_num}}</span><span>{{item.sell_unit}}</span>
-              </div></el-col>
-              <el-col :span="18"><div class="grid-content">
-                <span>{{item.goods_name}}</span>
-              </div></el-col>
-            </el-row>
-            <div>
-              <span>合计总数：</span><span>{{item.total_num}}</span>
-            </div>
-             <el-row>
-              <el-col :span="12"><div class="grid-content">
-                <span>{{item.receipt_area_code}}</span>
-              </div></el-col>
-              <el-col :span="12"><div class="grid-content">
-                <span>{{item.purchases_date}}</span>
-              </div></el-col>
-            </el-row>
-          </div>
-        </div>
+    
         <!-- <div class="pdfbox" id="pdfbox">
           
         </div>
         <div class="printButton">
           <el-button type="primary" @click="printPDF">打印</el-button>
         </div> -->
-      </div>
+      <!-- </div> -->
   </div>
 </template>
 
 <script>
 import '../../../tool.js'
-import html2canvas from "html2canvas"
 export default {
   name: 'CollectGoodsIndex',
   data () {
@@ -252,9 +220,10 @@ export default {
         brand:'',
         acceptance_num:''
       },
-      printShow:false,
       printDatas:[
       ], 
+      // 打印对象
+      LODOP:{}
     }
   },
   methods:{
@@ -326,25 +295,29 @@ export default {
       for(var i =0;i<this.multipleSelection.length;i++){
         choiceGoodIds.push(this.multipleSelection[i].id)
       }
-      this.$axios.get("/provider/purchases/print/lists",{
-        params:{ids:choiceGoodIds}
-      }).then(function(r){
-        that.printDatas=r.data.data;
-        html2canvas(document.querySelector("#pdfMian"),{
-            width:400
-        }).then(canvas => {
-            var bdHtml = document.body.innerHTML;
-            document.body.innerHTML="";
-            window.document.body.appendChild(canvas)
-            window.print();
-            document.body.innerHTML=bdHtml
-            // document.querySelector("#pdfbox").appendChild(canvas)
-        });
-      }).catch(function(){
-        that.$message.error({
-          message: '获取打印数据失败',
-        });
-      })
+      
+      // let printer = JSON.parse(localStorage.getItem('print')).billPrinter
+
+      // this.LODOP.PRINT_INITA(0, 0, 214, 600, '');
+      // this.LODOP.ADD_PRINT_TEXT(17, 39, 100, 35, '冰河物流');
+      // this.LODOP.SET_PRINT_STYLEA(0, 'FontName', '微软雅黑');
+      // this.LODOP.SET_PRINT_STYLEA(0, 'FontSize', 15);
+      // this.LODOP.SET_PRINT_STYLEA(0, 'Alignment', 2);
+      // this.LODOP.ADD_PRINT_TEXT(39, 39, 100, 25, '收据');
+      // this.LODOP.SET_PRINT_PAGESIZE(0, 570, 1100, 'note'); // 设置打印单据纸张大小
+      // this.LODOP.SET_PRINTER_INDEX(this.confirmPrinter(printer)); // 设置选择的打印机
+      // this.LODOP.SET_PRINT_MODE('CREATE_CUSTOM_PAGE_NAME', 'note'); // 设置自定义的纸张名字
+
+      // this.LODOP.PRINT();
+      // this.$axios.get("/provider/purchases/print/lists",{
+      //   params:{ids:choiceGoodIds}
+      // }).then(function(r){
+      //   that.printDatas=r.data.data;
+      // }).catch(function(){
+      //   that.$message.error({
+      //     message: '获取打印数据失败',
+      //   });
+      // })
     },
     printPDF(){
 
@@ -358,7 +331,7 @@ export default {
     // 弹出修改收货数量
     editInfo2(data){
       this.changeData.id = data.id;
-      this.changeData.acceptance_num=""
+      this.changeData.acceptance_num=data.purchases_num
       this.dialogFormVisible2=true;
     },
     // 修改品牌
@@ -389,7 +362,7 @@ export default {
       }
     },
     // 修改收货数量
-    submitInfo2(){
+    submitInfo2(row){
       var that = this;
       if(this.changeData.acceptance_num){
         this.$axios.post("/provider/allocate/acceptance-num/update",{
@@ -414,11 +387,47 @@ export default {
           type: 'warning'
         });
       }
+    },
+    // 确认收货
+    sureGood(data){
+      var that = this;
+      this.$confirm('是否确认收货?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+         this.$axios.post("/provider/allocate/acceptance-num/update",{
+            id:data.id,
+            acceptance_num:data.purchases_num
+          }).then(function(){
+            that.$message({
+              message: '修改成功！',
+              type: 'success'
+            });
+            that.search()
+          }).catch(function(){
+            that.$message.error({
+              message: '修改失败！',
+            });
+          })
+        })
+    },
+    // 确认打印机
+    confirmPrinter(printer){
+        
+        var iPrinterCount = this.LODOP.GET_PRINTER_COUNT();
+
+        for(let i=0; i<iPrinterCount; i++){
+            if(this.LODOP.GET_PRINTER_NAME(i)===printer){
+                return i;
+            }
+        }
     }
   },
   
   created(){
-    this.getNormalData()
+    this.getNormalData();
+    // this.LODOP = getLodop();
   }
 }
 </script>

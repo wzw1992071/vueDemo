@@ -3,8 +3,9 @@ import {Loading, Message, MessageBox} from 'element-ui'
 import Axios from 'axios'
 
 var axios = Axios.create({
-  baseURL: '/api',
-  timeout: 5000,
+  // baseURL: '/api',//本地开发用，打包注释
+
+  timeout: 30000,
   headers: {'X-Custom-Header': 'foobar'}
 });
 
@@ -31,7 +32,6 @@ axios.interceptors.response.use(function(res){
   //在这里对返回的数据进行处理
   loadinginstace.close();
   // 对登陆超时进行处理
-  console.log(res)
   if(res.data.code == 10106){
     MessageBox.alert('登陆超时', '提示',{
       confirmButtonText: '确定',

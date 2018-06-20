@@ -88,7 +88,8 @@ export default {
           }
         
         }
-        that.importAdd=(`${window.location.origin}/api/provider/order/gen/allocate-cargo?${hashParam}`)
+        console.log(that.importAdd)
+        that.importAdd=(`${window.location.origin}/provider/order/gen/allocate-cargo?${hashParam}`)
       }else{
         that.$message.error('请完善导入条件');
         return false;

@@ -115,13 +115,19 @@
             min-width="120"
             align="center">
           </el-table-column>
-            <el-table-column
+          <el-table-column
             prop="goods_name"
             label="商品名"
             min-width="200"
             align="center">
           </el-table-column>
-            <el-table-column
+          <el-table-column
+            prop="goods_number"
+            label="商品编号"
+            min-width="200"
+            align="center">
+          </el-table-column>
+          <el-table-column
             prop="purchases_num"
             label="采购数量"
             min-width="80"

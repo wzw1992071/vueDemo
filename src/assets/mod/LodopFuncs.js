@@ -118,4 +118,5 @@ function getLodop(oOBJECT,oEMBED){
         return LODOP;
     } catch(err) {alert("getLodop出错:"+err);};
 };
+window.getLodop=getLodop;
 
