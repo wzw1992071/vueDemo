@@ -227,6 +227,7 @@ export default {
   },
   created(){
     this.search()
+    
   }
 }
 </script>

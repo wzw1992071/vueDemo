@@ -295,7 +295,58 @@ export default {
       for(var i =0;i<this.multipleSelection.length;i++){
         choiceGoodIds.push(this.multipleSelection[i].id)
       }
-      
+      // var data = {
+      //   "id": 1,
+      //   "buyer_shop_name": "哈哈",
+      //   "buyer_tel": "15208359521",
+      //   "goods_number": "20180613-1",
+      //   "purchases_num": 44,
+      //   "sell_unit": "件",
+      //   "purchases_date": "2018-06-13",
+      //   "receipt_area_code": "Y-2",
+      //   "goods_name": "曾婷婷的测试商品走一波173  ",
+      //   "order_no": "15288784377061",
+      //   "total_num": "157"
+      // }
+      // var LODOP;
+      // LODOP=getLodop();  
+      // LODOP.PRINT_INIT("打印不干胶");  
+      // // LODOP.PRINT_INITA(0, 0, 214, 600, '');
+      // LODOP.SET_PRINT_PAGESIZE(0, 400, 600, 'tag')
+      // LODOP.ADD_PRINT_TEXT(10,5,260,100,`客户名：${data.buyer_shop_name}`);
+      // LODOP.SET_PRINT_STYLEA(0,"FontSize",5);
+      // LODOP.ADD_PRINT_TEXT(10,95,120,100,`编号：${data.goods_number}`);
+      // LODOP.SET_PRINT_STYLEA(0,"FontSize",4);
+      // LODOP.ADD_PRINT_TEXT(35,5,100,100,`${data.purchases_num}${data.sell_unit}`);
+      // LODOP.SET_PRINT_STYLEA(0,"FontSize",5);
+      // LODOP.ADD_PRINT_TEXT(35,35,100,100,`${data.goods_name}`);
+      // LODOP.SET_PRINT_STYLEA(0,"FontSize",5);
+      // LODOP.ADD_PRINT_TEXT(60,5,100,100,`合计总数：${data.total_num}`);
+      // LODOP.SET_PRINT_STYLEA(0,"FontSize",4);
+      // LODOP.ADD_PRINT_TEXT(85,5,100,100,`${data.receipt_area_code}`);
+      // LODOP.SET_PRINT_STYLEA(0,"FontSize",7);
+      // LODOP.ADD_PRINT_TEXT(85,55,100,100,`${data.purchases_date}`);
+      // LODOP.SET_PRINT_STYLEA(0,"FontSize",5);
+
+      // LODOP.ADD_PRINT_TEXT(130,5,260,100,`客户名：${data.buyer_shop_name}`);
+      // LODOP.SET_PRINT_STYLEA(0,"FontSize",5);
+      // LODOP.ADD_PRINT_TEXT(130,95,120,100,`编号：${data.goods_number}`);
+      // LODOP.SET_PRINT_STYLEA(0,"FontSize",4);
+      // LODOP.ADD_PRINT_TEXT(155,5,100,100,`${data.purchases_num}${data.sell_unit}`);
+      // LODOP.SET_PRINT_STYLEA(0,"FontSize",5);
+      // LODOP.ADD_PRINT_TEXT(155,35,100,100,`${data.goods_name}`);
+      // LODOP.SET_PRINT_STYLEA(0,"FontSize",5);
+      // LODOP.ADD_PRINT_TEXT(180,5,100,100,`合计总数：${data.total_num}`);
+      // LODOP.SET_PRINT_STYLEA(0,"FontSize",4);
+      // LODOP.ADD_PRINT_TEXT(205,5,100,100,`${data.receipt_area_code}`);
+      // LODOP.SET_PRINT_STYLEA(0,"FontSize",7);
+      // LODOP.ADD_PRINT_TEXT(205,55,100,100,`${data.purchases_date}`);
+      // LODOP.SET_PRINT_STYLEA(0,"FontSize",5);
+
+
+      // LODOP.SET_PREVIEW_WINDOW(0,1,0,800,600,"");//打印前弹出选择打印机的对话框	
+      // LODOP.SET_PRINT_MODE("AUTO_CLOSE_PREWINDOW",1);//打印后自动关闭预览窗口
+      // LODOP.PREVIEW();	
       // let printer = JSON.parse(localStorage.getItem('print')).billPrinter
 
       // this.LODOP.PRINT_INITA(0, 0, 214, 600, '');
@@ -309,15 +360,38 @@ export default {
       // this.LODOP.SET_PRINT_MODE('CREATE_CUSTOM_PAGE_NAME', 'note'); // 设置自定义的纸张名字
 
       // this.LODOP.PRINT();
-      // this.$axios.get("/provider/purchases/print/lists",{
-      //   params:{ids:choiceGoodIds}
-      // }).then(function(r){
-      //   that.printDatas=r.data.data;
-      // }).catch(function(){
-      //   that.$message.error({
-      //     message: '获取打印数据失败',
-      //   });
-      // })
+      this.$axios.get("/provider/purchases/print/lists",{
+        params:{ids:choiceGoodIds}
+      }).then(function(r){
+        that.printDatas=r.data.data;
+        var LODOP;
+        LODOP=getLodop();  
+        LODOP.PRINT_INIT("打印不干胶");  
+        LODOP.SET_PRINT_PAGESIZE(0, 400, (300*that.printDatas.length), 'tag')
+        for(let i = 0;i<that.printDatas.length;i++){
+          LODOP.ADD_PRINT_TEXT((10+i*115),5,260,100,`客户名：${that.printDatas[i].buyer_shop_name}`);
+          LODOP.SET_PRINT_STYLEA(0,"FontSize",5);
+          LODOP.ADD_PRINT_TEXT((10+i*115),95,100,100,`编号：${that.printDatas[i].goods_number}`);
+          LODOP.SET_PRINT_STYLEA(0,"FontSize",4);
+          LODOP.ADD_PRINT_TEXT((35+i*115),5,100,100,`${that.printDatas[i].purchases_num}${that.printDatas[i].sell_unit}`);
+          LODOP.SET_PRINT_STYLEA(0,"FontSize",5);
+          LODOP.ADD_PRINT_TEXT((35+i*115),35,100,100,`${that.printDatas[i].goods_name}`);
+          LODOP.SET_PRINT_STYLEA(0,"FontSize",5);
+          LODOP.ADD_PRINT_TEXT((60+i*115),5,100,100,`合计总数：${that.printDatas[i].total_num}`);
+          LODOP.SET_PRINT_STYLEA(0,"FontSize",4);
+          LODOP.ADD_PRINT_TEXT((85+i*115),5,100,100,`${that.printDatas[i].receipt_area_code}`);
+          LODOP.SET_PRINT_STYLEA(0,"FontSize",7);
+          LODOP.ADD_PRINT_TEXT((85+i*115),55,100,100,`${that.printDatas[i].purchases_date}`);
+          LODOP.SET_PRINT_STYLEA(0,"FontSize",5);
+        }
+        LODOP.SET_PREVIEW_WINDOW(0,1,0,800,600,"");//打印前弹出选择打印机的对话框	
+        LODOP.SET_PRINT_MODE("AUTO_CLOSE_PREWINDOW",1);//打印后自动关闭预览窗口
+        LODOP.PREVIEW();	
+      }).catch(function(){
+        that.$message.error({
+          message: '获取打印数据失败',
+        });
+      })
     },
     printPDF(){
 

@@ -3,7 +3,7 @@ import {Loading, Message, MessageBox} from 'element-ui'
 import Axios from 'axios'
 
 var axios = Axios.create({
-  // baseURL: '/api',//本地开发用，打包注释
+  baseURL: '/api',//本地开发用，打包注释
 
   timeout: 30000,
   headers: {'X-Custom-Header': 'foobar'}

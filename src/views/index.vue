@@ -21,7 +21,7 @@
 </template>
 
 <script>
-
+import '../assets/mod/LodopFuncs.js'
 import Nav from './components/nav'
 export default {
   name: 'index',
@@ -32,7 +32,7 @@ export default {
     return {
     }
   },
-    beforeCreate () {
+  beforeCreate () {
     // console.log(1)
     // 如果为本地，模拟登陆获取token
     if(window.location.hostname=="localhost"){
@@ -55,6 +55,8 @@ export default {
         labelPrinter: 'Microsoft XPS Document Writer'
     };
     localStorage.setItem('print', JSON.stringify(printConfig));
+  },
+  created(){
   }
 
 
