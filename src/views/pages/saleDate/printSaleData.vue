@@ -154,6 +154,7 @@ export default {
   name: 'PrintSaleData',
   data () {
     return {
+      dataTotal:0,
       // 搜索条件
       searchParam:{
         start_date:'',//开始时间
@@ -179,7 +180,6 @@ export default {
   methods:{
     // 请求页面数据
     search(){
-      console.log(1)
       var that= this
       let sendParamStr = JSON.stringify(this.searchParam)
       let sendParam = JSON.parse(sendParamStr)
@@ -221,7 +221,132 @@ export default {
       this.goodsInfo = rows[index].goods
     },
     morePrint(){
-      console.log(this.multipleSelection)
+      if(this.multipleSelection.length==0){
+        this.$message({
+          message: '请选择打印数据',
+          type: 'warning'
+        });
+        return false;
+      }
+      var choiceGoodIds= []
+      for(var i =0;i<this.multipleSelection.length;i++){
+        choiceGoodIds.push(this.multipleSelection[i].order_no)
+      }
+      this.$axios.get("/provider/purchases/sales/print",{
+        params:{orders_no:choiceGoodIds}
+      }).then(function(r){
+          var printData = r.data.data.orders;
+          var nowHeight=0;//初始高度20
+          var LODOP=getLodop();  
+          LODOP.PRINT_INIT("打印销售单"); 
+          // LODOP.SET_PRINT_PAGESIZE(0, 2100, 2400, 'bills'); 
+          LODOP.SET_PRINT_PAGESIZE(3,2100,25,"bills")
+          for(var j= 0;j<printData.length;j++){
+              // 循环开始
+            LODOP.ADD_PRINT_TEXT(nowHeight+20,300,500,100,"成都海霸王冻参谋销售单");
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",15);//距离顶部20加字体加间距总高40
+            nowHeight+=40;
+            LODOP.ADD_PRINT_TEXT(nowHeight,50,200,100,`客户名称：${printData[j].order.buyer_shop_name}`);
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);//距离顶部20加字体加间距总高30
+            LODOP.ADD_PRINT_TEXT(nowHeight,250,200,100,`客户电话：${printData[j].order.buyer_tel}`);
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);//距离顶部20加字体加间距总高30
+            LODOP.ADD_PRINT_TEXT(nowHeight,550,200,100,`编号：${printData[j].order.order_no}`);
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);//距离顶部20加字体加间距总高30
+            nowHeight+=30;
+            LODOP.ADD_PRINT_TEXT(nowHeight,50,400,100,`配送地址：${printData[j].order.receipt_address}`);
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);//距离顶部20加字体加间距总高30
+            LODOP.ADD_PRINT_TEXT(nowHeight,550,200,100,`送货日期：${printData[j].order.purchases_date}`);
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);//距离顶部20加字体加间距总高30
+            nowHeight+=30;
+            var tableMain = `
+            <style> table,td,th {border-width: 1px;border-style: solid;border-collapse: collapse;text-align:center}</style>
+            <table style="border-collapse:collapse">
+              <tr><td width="20%">品名</td><td width="4%">数量</td><td width="4%">单价</td><td width="4%">合计</td><td width="4%">单位</td></tr>`
+            if(printData[j].order.goods.length>9){
+              for(var i = 0;i<printData[j].order.goods.length;i++){
+                tableMain+=`<tr><td width="20%">${printData[j].order.goods[i].goods_name}</td>
+                                <td width="4%">${printData[j].order.goods[i].acceptance_num}</td>
+                                <td width="4%">${printData[j].order.goods[i].goods_sell_price}</td>
+                                <td width="4%">${printData[j].order.goods[i].total_money}</td>
+                                <td width="4%">${printData[j].order.goods[i].sell_unit}</td></tr>`
+              }
+            }else{
+              for(var i = 0;i<9;i++){
+                if(i<printData[j].order.goods.length){
+                  tableMain+=`<tr><td width="20%">${printData[j].order.goods[i].goods_name}</td>
+                                <td width="4%">${printData[j].order.goods[i].acceptance_num}</td>
+                                <td width="4%">${printData[j].order.goods[i].goods_sell_price}</td>
+                                <td width="4%">${printData[j].order.goods[i].total_money}</td>
+                                <td width="4%">${printData[j].order.goods[i].sell_unit}</td></tr>`
+                }else{
+                  tableMain+=`<tr><td width="20%">&nbsp;</td>
+                                <td width="4%">&nbsp;</td>
+                                <td width="4%">&nbsp;</td>
+                                <td width="4%">&nbsp;</td>
+                                <td width="4%">&nbsp;</td></tr>`
+                }
+              }
+            }
+            tableMain+="</table>"
+            var tableHeight = (printData[j].order.goods.length<9)?240:(22*(printData[j].order.goods.length+1))
+            LODOP.ADD_PRINT_TABLE(nowHeight,50,500,tableHeight,tableMain);
+
+            LODOP.ADD_PRINT_TEXT(nowHeight+20,580,200,100,`售后电话：${printData[j].order.after_sale_tel}`);
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
+            LODOP.ADD_PRINT_TEXT(nowHeight+50,580,200,200,`公司地址：${printData[j].order.company_address}`);
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
+            LODOP.ADD_PRINT_TEXT(nowHeight+110,580,200,200,`退货要求：${printData[j].order.return_goods_remark}`);
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
+            LODOP.ADD_PRINT_TEXT(nowHeight+190,580,200,200,"客户签收:");
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
+            // 备注数据处理
+            let getMoney,NogetMoney
+            if(printData[j].order.pay_mode =="在线支付"){
+              getMoney=printData[j].order.total_money
+              NogetMoney=0
+            }else{
+              getMoney=0
+              NogetMoney=printData[j].order.total_money
+            }
+
+            nowHeight+=tableHeight
+            LODOP.ADD_PRINT_TEXT(nowHeight,50,200,100,"备注");
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
+            nowHeight+=30;
+            LODOP.ADD_PRINT_TEXT(nowHeight,50,200,100,`件数：${printData[j].order.total_num}`);
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
+            LODOP.ADD_PRINT_TEXT(nowHeight,250,200,100,`本单金额：${printData[j].order.total_money}元`);
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
+            LODOP.ADD_PRINT_TEXT(nowHeight,450,200,100,"运费：0元");
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
+            nowHeight+=30;
+            LODOP.ADD_PRINT_TEXT(nowHeight,50,200,100,`已收款：${getMoney}元`);
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
+            LODOP.ADD_PRINT_TEXT(nowHeight,250,200,100,`未收金额：${NogetMoney}元`);
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
+            nowHeight+=30;
+
+            LODOP.ADD_PRINT_RECT(nowHeight,50,720,1,0,1);
+            // 边框离纸张顶端10px(px是绝对值长度，等于1/96英寸,下同)距左边55px、宽360px、高220px、
+            // 框为实线(0-实线 1-破折线 2-点线 3-点划线 4-双点划线)、线宽为1px
+            nowHeight+=10;
+
+            LODOP.ADD_PRINT_TEXT(nowHeight,50,200,100,"付款方式：1.现金");
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
+            LODOP.ADD_PRINT_TEXT(nowHeight,180,250,100,`2.支付宝${printData[j].order.alipay}`);
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
+            LODOP.ADD_PRINT_TEXT(nowHeight,420,200,100,"请备注店名，以方便查账");
+            LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
+            nowHeight+=60;
+            // 循环结束
+          }
+            
+
+          LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
+          LODOP.SET_PREVIEW_WINDOW(0,1,0,800,600,"");//打印前弹出选择打印机的对话框	
+          LODOP.SET_PRINT_MODE("AUTO_CLOSE_PREWINDOW",1);//打印后自动关闭预览窗口
+          LODOP.PREVIEW();	
+      })
     },
     
   },
