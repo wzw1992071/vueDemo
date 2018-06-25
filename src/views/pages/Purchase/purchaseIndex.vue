@@ -63,7 +63,7 @@
         <el-table
           :data="tableData"
           :stripe=true
-          max-height="800"
+          max-height="4000"
           border
           align="center"
           ref="multipleTable"
@@ -183,7 +183,7 @@
           </el-pagination>
       </div>
 
-      <!-- 修改供应商弹出框 -->
+      <!-- 修改供应商弹出框（批量修改） -->
       <el-dialog title="修改资料" :visible.sync="dialogFormVisible2" width="80%">
         <div>
           <el-row class="oneLine">
@@ -195,6 +195,25 @@
                 <el-col :span="6"><div class="inputTitle">供应商名称电话：</div></el-col>
                 <el-col :span="18"><el-input v-model="changeSellData.seller_tel"></el-input></el-col>
             </div></el-col>
+          </el-row>   
+        </div>
+         <div>
+          <el-row class="oneLine">
+            <el-col :span="10">
+              <div class="grid-content inputGroup">                
+                <el-col :span="6"><div class="inputTitle">供应商名称：</div></el-col>
+                <el-col :span="18">
+                  <el-select v-model="changeSellData.purchases_mode" placeholder="请选择">
+                    <el-option
+                      v-for="item in selectData.purchases_mode"
+                      :key="item.value"
+                      :label="item.name"
+                      :value="item.id">
+                    </el-option>
+                  </el-select>
+                </el-col>
+              </div>
+            </el-col>
           </el-row>   
         </div>
         <div slot="footer" class="dialog-footer">
@@ -288,12 +307,12 @@ export default {
     return {
       // 搜索条件
       searchParam:{
-        start_date:'',//开始时间
-        end_date:'',//结束时间
+        start_date:$tools.dateFormat(new Date()),//开始时间
+        end_date:$tools.dateFormat(new Date()),//结束时间
         seller:'',//客户供应商
         goods_name:'',//商品名
         page:'1',//当前页
-        size:'10',//每页数量
+        size:'50',//每页数量
         reach_status:'',//到货状态
         status:''//采购状态
       },
@@ -330,9 +349,11 @@ export default {
       dialogFormVisible: false,
       // 修改供应商弹出框是否展示
       dialogFormVisible2:false,
+      // 批量修改参数
       changeSellData:{
-        seller_shop:'',//供货商店名
-        seller_tel:''//供货商电话
+        seller_shop:'', //供货商店名
+        seller_tel:'', //供货商电话
+        purchases_mode:'' //采购方式
       },
     }
   },
@@ -448,7 +469,8 @@ export default {
         // 弹出框数据清零
         this.changeSellData={
           seller_shop:'',//供货商店名
-          seller_tel:''//供货商电话
+          seller_tel:'',//供货商电话
+          purchases_mode:''
         }
       }else{
         this.$message({
@@ -464,27 +486,40 @@ export default {
       var that=this;
       // 组装发送数据
       var sendParam={
-        ids:[]
+        ids:[],
+        values:{}
       }
       for(let i=0;i<this.multipleSelection.length;i++){
         sendParam.ids.push(this.multipleSelection[i].id)
       }
-      sendParam.seller_shop=this.changeSellData.seller_shop;
-      sendParam.seller_tel=this.changeSellData.seller_tel;
+      this.changeSellData.seller_shop?sendParam.values.seller_shop=this.changeSellData.seller_shop:'';
+      this.changeSellData.seller_tel?sendParam.values.seller_tel=this.changeSellData.seller_tel:'';
+      this.changeSellData.purchases_mode?sendParam.values.purchases_mode=this.changeSellData.purchases_mode:'';
+      // console.log(sendParam)
       this.$axios.post("/provider/purchases/seller/update",sendParam)
-      .then(function(){
-        that.$message({
-          message: '修改成功！',
-          type: 'success'
-        });
-        that.dialogFormVisible2 = false
-        that.search()
+      .then(function(r){
+        console.log(r.data.code)
+        if(r.data.code==0){
+           that.$message({
+            message: '修改成功！',
+            type: 'success'
+          });
+          that.dialogFormVisible2 = false
+          that.search()
+        }else{
+          that.$message.error({
+            message: '修改失败！',
+          });
+          console.log("获取数据失败1")
+          that.dialogFormVisible2 = false
+        }
+       
       }).catch(function(){
         that.$message.error({
           message: '修改失败！',
         });
         console.log("获取数据失败")
-        that.dialogFormVisible = false
+        that.dialogFormVisible2 = false
       })
     }
   },

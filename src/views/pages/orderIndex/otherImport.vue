@@ -62,8 +62,8 @@ export default {
       ],
       // 导入条件
       entryParam:{
-        begin:'',//开始时间
-        end:'',//结束时间
+        begin:$tools.dateFormat(new Date()),//开始时间
+        end:$tools.dateFormat(new Date()),//结束时间
         sp_id:'',//客户名
         status:[]//选中状态
       },

@@ -194,8 +194,8 @@ export default {
     return {
        // 搜索条件
       searchParam:{
-        start_date:'',//开始时间
-        end_date:'',//结束时间
+        start_date:$tools.dateFormat(new Date()),//开始时间
+        end_date:$tools.dateFormat(new Date()),//结束时间
         seller:'',//供应商信息 
         goods_name:'',//商品名
         page:'1',//当前页
