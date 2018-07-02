@@ -24,5 +24,5 @@ For detailed explanation on how things work, checkout the [guide](http://vuejs-t
 在/config/index.js  中dev下面proxyTable下的target 改为代理地址
 在/src/views/index.vue  mounted里模拟登陆获取token
 
-打印需要引入
-html2canvas
+打包时导出需修改action,可以搜索/api定位所有
+注释掉http.js关于api的那句

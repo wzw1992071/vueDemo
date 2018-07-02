@@ -2,62 +2,71 @@
 <template>
   <div class="mainBox">
       <!-- 搜索条件 -->
-      <div class="searchArea">
-        <div>
-          <div class="block">
-            <el-date-picker
-              v-model="searchParam.start_date"
-              type="date"
-              placeholder="开始日期">
-            </el-date-picker>
+      <!-- 本地 -->
+      <!-- <form  id="searchForm" action="/api/provider/purchases/export" method="get" target="_blank"> -->
+       <!-- 线上版本 -->
+     <form  id="searchForm" :action="formAction" method="get" target="_blank">
+        <div class="searchArea">
+          
+          <div>
+            <div class="block">
+              <el-date-picker
+                v-model="searchParam.start_date"
+                name="start_date"
+                type="date"
+                placeholder="开始日期">
+              </el-date-picker>
+            </div>
+            <div class="line">至</div>
+            <div class="block">
+              <el-date-picker
+                v-model="searchParam.end_date"
+                name= "end_date"
+                type="date"
+                placeholder="结束日期">
+              </el-date-picker>
+            </div>
           </div>
-          <div class="line">至</div>
-          <div class="block">
-            <el-date-picker
-              v-model="searchParam.end_date"
-              type="date"
-              placeholder="结束日期">
-            </el-date-picker>
+          <div class="demo-input-suffix">
+            <span>客户：</span>  
+            <el-input v-model="searchParam.seller" name="seller"></el-input>
+          </div>
+          <div class="demo-input-suffix">
+            <span>商品名：</span>  
+            <el-input v-model="searchParam.goods_name" name="goods_name"></el-input>
           </div>
         </div>
-        <div class="demo-input-suffix">
-          <span>客户：</span>  
-          <el-input v-model="searchParam.seller"></el-input>
+        <div class="searchArea">
+          <div class="selecDiv">
+            <span>到货状态：</span>
+            <el-select class="" v-model="searchParam.reach_status" name="reach_status" clearable  placeholder="请选择">
+              <el-option
+                v-for="item in selectData.reach_status"
+                :key="item.value"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </div>
+          <div class="selecDiv">
+            <span>采购状态：</span>
+            <el-select class="" v-model="searchParam.status" name="status" clearable  placeholder="请选择">
+              <el-option
+                v-for="item in selectData.status"
+                :key="item.value"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </div>
         </div>
-        <div class="demo-input-suffix">
-          <span>商品名：</span>  
-          <el-input v-model="searchParam.goods_name"></el-input>
+        <!-- 搜索按钮 -->
+        <div class="btnGuoup">
+            <el-button type="primary" icon="el-icon-edit" @click="moreEdit">批量修改</el-button>
+            <el-button type="primary" icon="el-icon-document" @click="exportMsg">导出</el-button>
+            <el-button type="primary" icon="el-icon-search" @click="search">搜索</el-button>
         </div>
-      </div>
-      <div class="searchArea">
-        <div class="selecDiv">
-          <span>到货状态：</span>
-          <el-select v-model="searchParam.reach_status" placeholder="请选择">
-            <el-option
-              v-for="item in selectData.reach_status"
-              :key="item.value"
-              :label="item.name"
-              :value="item.id">
-            </el-option>
-          </el-select>
-        </div>
-        <div class="selecDiv">
-          <span>采购状态：</span>
-          <el-select v-model="searchParam.status" placeholder="请选择">
-            <el-option
-              v-for="item in selectData.status"
-              :key="item.value"
-              :label="item.name"
-              :value="item.id">
-            </el-option>
-          </el-select>
-        </div>
-      </div>
-      <!-- 搜索按钮 -->
-      <div class="btnGuoup">
-          <el-button type="primary" icon="el-icon-edit" @click="moreEdit">批量修改</el-button>
-          <el-button type="primary" icon="el-icon-search" @click="search">搜索</el-button>
-      </div>
+      </form>
        <!-- 表单 -->
       <div class="tableArea">
         <el-table
@@ -70,12 +79,14 @@
           @selection-change="handleSelectionChange"
           >
           <el-table-column
+            fixed
             label="序号"
             type="index"
             align="center"
             width="50">
           </el-table-column>
            <el-table-column
+            fixed
             type="selection"
             width="55">
           </el-table-column>
@@ -94,18 +105,19 @@
           <el-table-column
             prop="buyer_tel"
             label="客户电话"
-            min-width="200"
+            min-width="150"
             align="center">
           </el-table-column>
           <el-table-column
             prop="seller_tel"
             label="供应商电话"
-            min-width="200"
+            min-width="150"
             align="center">
           </el-table-column>
             <el-table-column
             prop="seller_shop"
             label="供应商名称"
+            sortable
             min-width="200"
             align="center">
           </el-table-column>
@@ -137,12 +149,14 @@
             prop="purchases_price"
             label="采购价格"
             min-width="100"
+            :formatter="formatter"
             align="center">
           </el-table-column>
           <el-table-column
             prop="goods_sell_price"
             label="销售价格"
             min-width="100"
+            :formatter="formatter"
             align="center">
           </el-table-column>
           <el-table-column
@@ -177,6 +191,7 @@
       <div class="pageControl">
           <el-pagination
             background
+            :page-size=50
             layout="prev, pager, next"
             @current-change="pageChange"
             :total="dataTotal">
@@ -203,7 +218,7 @@
               <div class="grid-content inputGroup">                
                 <el-col :span="6"><div class="inputTitle">供应商名称：</div></el-col>
                 <el-col :span="18">
-                  <el-select v-model="changeSellData.purchases_mode" placeholder="请选择">
+                  <el-select v-model="changeSellData.purchases_mode" clearable placeholder="请选择">
                     <el-option
                       v-for="item in selectData.purchases_mode"
                       :key="item.value"
@@ -279,7 +294,7 @@
             <el-col :span="8"><div class="grid-content inputGroup">
                 <el-col :span="6"><div class="inputTitle">采购方式：</div></el-col>
                 <el-col :span="18">
-                  <el-select v-model="changeData.purchases_mode" placeholder="请选择">
+                  <el-select v-model="changeData.purchases_mode" clearable  placeholder="请选择">
                     <el-option
                       v-for="item in selectData.purchases_mode"
                       :key="item.value"
@@ -302,19 +317,19 @@
 <script>
 import '../../../tool.js'
 export default {
-  name: 'OrderList',
+  name: 'purchaseIndex',
   data () {
     return {
       // 搜索条件
       searchParam:{
-        start_date:$tools.dateFormat(new Date()),//开始时间
-        end_date:$tools.dateFormat(new Date()),//结束时间
+        start_date:new Date(),//开始时间
+        end_date:new Date(),//结束时间
         seller:'',//客户供应商
         goods_name:'',//商品名
-        page:'1',//当前页
-        size:'50',//每页数量
+        page:1,//当前页
+        size:50,//每页数量
         reach_status:'',//到货状态
-        status:''//采购状态
+        status:[]//采购状态
       },
       // 下拉框数据
       selectData:{
@@ -355,6 +370,17 @@ export default {
         seller_tel:'', //供货商电话
         purchases_mode:'' //采购方式
       },
+    }
+  },
+  computed:{
+    formAction(){
+      let url = ""
+      if(window.location.hostname=="localhost"){
+        url = "/api/provider/purchases/export"
+      }else{
+        url = "/provider/purchases/export"
+      }
+      return url
     }
   },
   methods:{
@@ -415,6 +441,10 @@ export default {
       this.goodsInfo = rows[index].goods
     },
     // 表单功能
+    // 表格数据过滤
+    formatter(row, column) {
+        return (row[column.property]/100).toFixed(2)
+    },
     // 全选功能
     handleSelectionChange(val) {
       this.multipleSelection = val;
@@ -423,6 +453,8 @@ export default {
     editInfo(data){
       // 将当前行的数据单独保存起来,显示弹窗
       this.changeData = data
+      this.changeData.purchases_price = (this.changeData.purchases_price/100).toFixed(2)
+      this.changeData.goods_sell_price = (this.changeData.goods_sell_price/100).toFixed(2)
       this.changeDataOld = JSON.parse(JSON.stringify(data))
       this.dialogFormVisible = true
     },
@@ -442,6 +474,13 @@ export default {
         });
         this.dialogFormVisible = false
       }else{
+        // 如果有价格，价格要转化为分
+        if(sendParam.purchases_price){
+          sendParam.purchases_price=sendParam.purchases_price*100
+        }
+        if(sendParam.goods_sell_price){
+          sendParam.goods_sell_price=sendParam.goods_sell_price*100
+        }
         this.$axios.post("/provider/purchases/update",[{
           id:that.changeData.id,
           fields:sendParam
@@ -480,6 +519,18 @@ export default {
         return false;
       }
     
+    },
+    
+    // 导出功能
+    exportMsg(){
+      if(this.searchParam.start_date&&this.searchParam.end_date){
+        this.$el.querySelector("#searchForm").submit()
+      }else{
+        this.$message({
+          message: '请选择导出日期！',
+          type: 'warning'
+        });
+      }
     },
     // 供应商修改提交
     changeSeller(){
@@ -562,6 +613,9 @@ export default {
           text-align: right 
         }
       }
+    }
+    .bigSelect{
+      width: 300px;
     }
     .btnGuoup{
       display: flex;

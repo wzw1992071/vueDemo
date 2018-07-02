@@ -22,6 +22,11 @@
             console.log("请传入时间")
         }
     }
+    // 数组原型拓展方法
+    Array.prototype.delete = function(dx) { 
+        if(isNaN(dx)||dx>this.length){return false;} 
+        this.splice(dx,1); 
+    } 
 
     window.$tools=$tools;
 })()

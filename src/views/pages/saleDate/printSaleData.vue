@@ -2,18 +2,24 @@
 <template>
   <div class="mainBox">
     <!-- 搜索条件 -->
+    <!-- 本地 -->
+     <!-- <form  id="searchForm" action="/api/provider/purchases/sales/export" method="get" target="_blank"> -->
+     <!-- 线上版本 -->
+     <form  id="searchForm" :action="formAction" method="get" target="_blank">
       <div class="searchArea">
         <div>
           <div class="block">
             <el-date-picker
               v-model="searchParam.start_date"
               type="date"
+              name="start_date"
               placeholder="开始日期">
             </el-date-picker>
           </div>
           <div class="line">至</div>
           <div class="block">
             <el-date-picker
+              name= "end_date"
               v-model="searchParam.end_date"
               type="date"
               placeholder="结束日期">
@@ -22,18 +28,19 @@
         </div>
         <div class="demo-input-suffix">
           <span>店铺名：</span>  
-          <el-input v-model="searchParam.buyer"></el-input>
+          <el-input v-model="searchParam.buyer" name="buyer"></el-input>
         </div>
         <!-- <div class="demo-input-suffix">
           <span>商品名：</span>  
           <el-input v-model="searchParam.goods_name"></el-input>
         </div> -->
       </div>
+      </form>
       <!-- 搜索按钮 -->
       <div class="btnGuoup">
-          <el-button type="primary" icon="el-icon-search" @click="search">搜索</el-button>
-          <!-- <el-button type="warning" icon="el-icon-printer" @click="print">打印</el-button> -->
           <el-button type="danger" icon="el-icon-printer" @click="morePrint">批量打印</el-button>
+          <el-button type="primary" icon="el-icon-document" @click="exportMsg">导出</el-button>
+          <el-button type="primary" icon="el-icon-search" @click="search">搜索</el-button>
       </div>
       <!-- 表单 -->
       <div class="tableArea">
@@ -100,9 +107,11 @@
           </el-table-column>
             <el-table-column
             prop="total_money"
-            label="商品金额"
+            label="总金额"
             min-width="100"
+            :formatter="formatter"
             align="center">
+            
           </el-table-column>
             <el-table-column
             prop="receipt_area_code"
@@ -123,7 +132,7 @@
                 <el-table :data="goodsInfo" border max-height="500">
                   <el-table-column label="序号" type="index" align="center" width="50"></el-table-column>
                   <el-table-column min-width="150" align="center" property="goods_name" label="品名"></el-table-column>
-                  <el-table-column min-width="100" align="center" property="goods_sell_price" label="单价"></el-table-column>
+                  <el-table-column min-width="100" align="center" property="goods_sell_price" label="单价（元）" :formatter="formatter"></el-table-column>
                   <el-table-column min-width="100" align="center" property="acceptance_num" label="数量"></el-table-column>
                   <el-table-column min-width="100" align="center" property="sell_unit" label="单位"></el-table-column>
                   <el-table-column min-width="150" align="center" property="goods_number" label="商品编号"></el-table-column>
@@ -150,6 +159,7 @@
 
 
 <script>
+import '../../../tool.js'
 export default {
   name: 'PrintSaleData',
   data () {
@@ -157,12 +167,12 @@ export default {
       dataTotal:0,
       // 搜索条件
       searchParam:{
-        start_date:$tools.dateFormat(new Date()),//开始时间
-        end_date:$tools.dateFormat(new Date()),//结束时间
+        start_date:new Date(),//开始时间
+        end_date:new Date(),//结束时间
         buyer:'',//客户名
         goods_name:'',//商品名称
-        page:'1',//当前页
-        size:'10'//每页数量
+        page:1,//当前页
+        size:10//每页数量
       },
       // 下拉框属性
       selectOptions:{
@@ -175,6 +185,17 @@ export default {
       goodsInfo:[],
       // 复选框中的项
       multipleSelection: []
+    }
+  },
+  computed:{
+    formAction(){
+      let url = ""
+      if(window.location.hostname=="localhost"){
+        url = "/api/provider/purchases/sales/export"
+      }else{
+        url = "/provider/purchases/sales/export"
+      }
+      return url
     }
   },
   methods:{
@@ -211,6 +232,11 @@ export default {
     pageChange(page){
       this.searchParam.page = page;
       this.search();
+    },
+    // 表单
+    // 过滤
+    formatter(row, column) {
+        return (row[column.property]/100).toFixed(2)
     },
     // 全选功能
     handleSelectionChange(val) {
@@ -348,11 +374,21 @@ export default {
           LODOP.PREVIEW();	
       })
     },
+    // 导出功能
+    exportMsg(){
+      if(this.searchParam.start_date&&this.searchParam.end_date){
+        this.$el.querySelector("#searchForm").submit()
+      }else{
+        this.$message({
+          message: '请选择导出日期！',
+          type: 'warning'
+        });
+      }
+    },
     
   },
   created(){
-    this.search()
-    
+    this.search()    
   }
 }
 </script>

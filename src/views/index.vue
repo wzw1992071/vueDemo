@@ -36,15 +36,15 @@ export default {
     // console.log(1)
     // 如果为本地，模拟登陆获取token
     if(window.location.hostname=="localhost"){
-      this.$axios.post("/user/login",{
-        login_name:"10000000000",
-        login_password:"1234567890"
+       this.$axios.post("/user/login/test",{
+    
       })
       .then(function(){
         console.log("登陆成功")})
       .catch(function(){
           console.log("登陆失败，请重新登陆")
       })
+  
     }
     // 保存本地打印机设置(暂时写死，没有打印机配置)
     let printConfig = {

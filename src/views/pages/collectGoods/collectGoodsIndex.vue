@@ -31,9 +31,8 @@
       </div>
       <!-- 搜索按钮 -->
       <div class="btnGuoup">
-          <el-button type="primary" icon="el-icon-search" @click="search">搜索</el-button>
-          <!-- <el-button type="warning" icon="el-icon-printer" @click="print">打印</el-button> -->
           <el-button type="danger" icon="el-icon-printer" @click="morePrint">批量打印</el-button>
+          <el-button type="primary" icon="el-icon-search" @click="search">搜索</el-button>
       </div>
       <!-- 表单 -->
       <div class="tableArea">
@@ -194,8 +193,8 @@ export default {
     return {
        // 搜索条件
       searchParam:{
-        start_date:$tools.dateFormat(new Date()),//开始时间
-        end_date:$tools.dateFormat(new Date()),//结束时间
+        start_date:new Date(),//开始时间
+        end_date:new Date(),//结束时间
         seller:'',//供应商信息 
         goods_name:'',//商品名
         page:'1',//当前页

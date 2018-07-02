@@ -2,15 +2,20 @@
 import {Loading, Message, MessageBox} from 'element-ui'
 import Axios from 'axios'
 
+let BaseUrl = ""
+if(window.location.hostname=="localhost"){
+  BaseUrl = "/api"
+}else{
+  BaseUrl = ""
+}
+console.log(BaseUrl)
 var axios = Axios.create({
-  baseURL: '/api',//本地开发用，打包注释
-
+  baseURL: BaseUrl,//本地开发用，打包注释
   timeout: 30000,
-  headers: {'X-Custom-Header': 'foobar'}
+  headers: {
+    // 'X-Custom-Header': 'foobar'
+  }
 });
-
-
-
 
 var loadinginstace
 //添加一个请求拦截器
@@ -43,10 +48,10 @@ axios.interceptors.response.use(function(res){
   return res;
 },function(err){
   //Do something with response error
-
+    console.log(err)
     loadinginstace.close();
     Message.error({
-        message:"请求失败"
+        message:"请求失败1"
     })
   return Promise.reject(error);
 })
