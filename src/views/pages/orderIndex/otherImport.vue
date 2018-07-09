@@ -84,12 +84,18 @@ export default {
             hashParam+=(`&sp_id=${that.entryParam.sp_id}`)
           }
           if(that.entryParam.status.length>0){
-            hashParam+=(`&status=${that.entryParam.status.join(',')}`)
+            for(var i = 0;i<that.entryParam.status.length;i++){
+              hashParam+=(`&status[]=${that.entryParam.status[i]}`)
+            }
+            
           }
         
         }
-        console.log(that.importAdd)
-        that.importAdd=(`${window.location.origin}/provider/order/gen/allocate-cargo?${hashParam}`)
+        if(window.location.hostname=="localhost"){
+          that.importAdd=(`${window.location.origin}/api/provider/order/gen/allocate-cargo?${hashParam}`)
+        }else{
+          that.importAdd=(`${window.location.origin}/provider/order/gen/allocate-cargo?${hashParam}`)
+        }
       }else{
         that.$message.error('请完善导入条件');
         return false;
@@ -137,7 +143,9 @@ export default {
       padding-bottom: 10px;
     }
     .importIframe{
-      border: 0
+      border: 0;
+      width: 800px;
+      height: 500px;
     }
   }
 </style>

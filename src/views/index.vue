@@ -72,13 +72,14 @@ export default {
   .logo{
     position: absolute;
     left: 40px;
-    top: 10px ;
+    top: 6px ;
   }
   .el-header{
-    line-height:60px;
+    line-height:50px;
     padding: 0 80px 0;
     background-color: #38B7F6;
-    color: #fff
+    color: #fff;
+    height: 50px !important;
   }
   // 页面主体样式
   .el-container{

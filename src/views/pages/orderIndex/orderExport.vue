@@ -1,16 +1,26 @@
 // 导出订单页面
 <template>
   <div class="mainBox">
-      {{msg}}
+    <div class="box">
+      <MoreChoice :info="choiseData"></MoreChoice>
+    </div>
+      
   </div>
 </template>
 
 <script>
+import MoreChoice from '@components/moreChoice'
+
 export default {
   name: 'OrderExport',
+  components: {
+    MoreChoice
+  },
   data () {
     return {
-      msg: '导出订单页面'
+      choiseData:{
+      }
+     
     }
   }
 }
@@ -21,5 +31,8 @@ export default {
   .mainBox{
     height: 100%;
     background: #fff;
+    .box{
+      width: 200px
+    }
   }
 </style>

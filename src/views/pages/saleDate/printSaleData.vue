@@ -34,14 +34,17 @@
           <span>商品名：</span>  
           <el-input v-model="searchParam.goods_name"></el-input>
         </div> -->
+         <div class="btnGuoup">
+            <el-button type="success" icon="el-icon-search" @click="search">确定</el-button>
+            <el-button type="danger" icon="el-icon-printer" @click="morePrint">批量打印</el-button>
+            <el-button type="primary" icon="el-icon-document" @click="exportMsg">导出</el-button>
+           
+        </div>
       </div>
       </form>
       <!-- 搜索按钮 -->
-      <div class="btnGuoup">
-          <el-button type="danger" icon="el-icon-printer" @click="morePrint">批量打印</el-button>
-          <el-button type="primary" icon="el-icon-document" @click="exportMsg">导出</el-button>
-          <el-button type="primary" icon="el-icon-search" @click="search">搜索</el-button>
-      </div>
+     
+      <p style="color:#f00;"> 温馨提示：按住shift，可以用滚轮操作横向滚动条</p>
       <!-- 表单 -->
       <div class="tableArea">
         <el-table
@@ -149,6 +152,7 @@
       <div class="pageControl">
           <el-pagination
             background
+            :page-size=50
             layout="prev, pager, next"
             @current-change="pageChange"
             :total="dataTotal">
@@ -172,7 +176,7 @@ export default {
         buyer:'',//客户名
         goods_name:'',//商品名称
         page:1,//当前页
-        size:10//每页数量
+        size:50//每页数量
       },
       // 下拉框属性
       selectOptions:{
@@ -399,9 +403,10 @@ export default {
     height: 100%;
     background: #fff;
     .searchArea{
-      margin: 0 10px 10px;
-      padding: 15px 0;
+      margin: 0 10px 0px;
+      padding: 15px 0 0;
       display: flex;
+       border-bottom: 1px solid #ccc;
       justify-content: flex-start;
       &>div{
         display: flex;
@@ -425,7 +430,7 @@ export default {
       justify-content: flex-end; 
       margin: 0 10px 10px;     
       padding-bottom: 10px;
-      border-bottom: 1px solid #ccc
+     
     }
     .tableArea{
       margin: 10px;

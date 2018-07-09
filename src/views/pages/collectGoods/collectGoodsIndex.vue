@@ -2,38 +2,55 @@
 <template>
     <div class="mainBox">
     <!-- 搜索条件 -->
-      <div class="searchArea">
-        <div>
-          <div class="block">
-            <el-date-picker
-              v-model="searchParam.start_date"
-              type="date"
-              placeholder="开始日期">
-            </el-date-picker>
+      <div class="searchBox">
+        <div class="searchArea">
+          <div>
+            <div class="block">
+              <el-date-picker
+                v-model="searchParam.start_date"
+                type="date"
+                placeholder="开始日期">
+              </el-date-picker>
+            </div>
+            <div class="line">至</div>
+            <div class="block">
+              <el-date-picker
+                v-model="searchParam.end_date"
+                type="date"
+                placeholder="结束日期">
+              </el-date-picker>
+            </div>
           </div>
-          <div class="line">至</div>
-          <div class="block">
-            <el-date-picker
-              v-model="searchParam.end_date"
-              type="date"
-              placeholder="结束日期">
-            </el-date-picker>
+          <div class="demo-input-suffix">
+            <span>供应商：</span>  
+            <el-input v-model="searchParam.seller"></el-input>
+          </div>
+          <div class="demo-input-suffix">
+            <span>商品名：</span>  
+            <el-input v-model="searchParam.goods_name"></el-input>
           </div>
         </div>
-        <div class="demo-input-suffix">
-          <span>供应商：</span>  
-          <el-input v-model="searchParam.seller"></el-input>
-        </div>
-        <div class="demo-input-suffix">
-          <span>商品名：</span>  
-          <el-input v-model="searchParam.goods_name"></el-input>
+        <div class="searchArea">
+          <div class="demo-input-suffix">
+            <span>采购商：</span>  
+             <el-autocomplete 
+                v-model="searchParam.buyer"
+                :fetch-suggestions="querySearchbuyer"
+                :trigger-on-focus="false"
+                >
+                </el-autocomplete>
+          </div>
+            <!-- 搜索按钮 -->
+          <div class="btnGuoup">
+              <el-button type="success" icon="el-icon-search" @click="search">搜索</el-button>
+              <el-button type="primary" icon="el-icon-goods" @click="moreSure">批量确认</el-button> 
+              <el-button type="danger" icon="el-icon-printer" @click="morePrint">批量打印</el-button>
+          </div>
         </div>
       </div>
-      <!-- 搜索按钮 -->
-      <div class="btnGuoup">
-          <el-button type="danger" icon="el-icon-printer" @click="morePrint">批量打印</el-button>
-          <el-button type="primary" icon="el-icon-search" @click="search">搜索</el-button>
-      </div>
+     
+    
+     <p style="color:#f00;"> 温馨提示：按住shift，可以用滚轮操作横向滚动条</p>
       <!-- 表单 -->
       <div class="tableArea">
         <el-table
@@ -58,13 +75,14 @@
            <el-table-column
             prop="purchases_date"
             label="订单日期"
-            min-width="150"
+            min-width="80"
             align="center">
           </el-table-column>
           <el-table-column
             prop="seller_shop"
+            sortable
             label="卖家名称"
-            min-width="150"
+            min-width="120"
             align="center">
           </el-table-column>
           <el-table-column
@@ -82,50 +100,51 @@
           <el-table-column
             prop="goods_name"
             label="商品名称"
-            min-width="200"
+            sortable
+            min-width="120"
             align="center">
           </el-table-column>
           <el-table-column
             prop="purchases_num"
             label="采购数量"
-            min-width="120"
+            min-width="60"
             align="center">
           </el-table-column>
           <el-table-column
             prop="acceptance_num"
             label="收货数量"
-            min-width="120"
+            min-width="60"
             align="center">
           </el-table-column>
           <el-table-column
-            prop="statusName"
+            prop="reach_status"
             label="货物状态"
-            min-width="120"
+            min-width="80"
             align="center">
           </el-table-column>
           <el-table-column
             prop="receipt_area_code"
             label="送货区域"
-            min-width="120"
+            min-width="60"
             align="center">
           </el-table-column>
           <el-table-column
             prop="new_brand"
             label="换品牌"
-            min-width="120"
+            min-width="80"
             align="center">
           </el-table-column>
           <el-table-column
-            prop="acceptance_num"
+            prop="print_times"
             label="是否打印标签"
-            min-width="120"
+            min-width="60"
             align="center">
           </el-table-column>
           <el-table-column
             fixed="right"
             label="操作"
             align="center"
-            width="250">
+            width="100">
               <template slot-scope="scope">
                 <el-button @click="sureGood(scope.row)" type="text" size="small">确认收货</el-button>
                 <el-button @click="editInfo1(scope.row)" type="text" size="small">修改货物品牌</el-button>
@@ -137,6 +156,7 @@
       <div class="pageControl">
           <el-pagination
             background
+            :page-size=50
             layout="prev, pager, next"
             @current-change="pageChange"
             :total="dataTotal">
@@ -144,7 +164,7 @@
       </div>
 
        <!-- 修改品牌弹出框 -->
-      <el-dialog title="修改品牌" :visible.sync="dialogFormVisible1" width="80%">
+      <el-dialog title="修改品牌" :visible.sync="dialogFormVisible1" width="40%">
         <div>
           <el-row class="oneLine">
             <el-col :span="20"><div class="grid-content inputGroup">
@@ -159,10 +179,10 @@
         </div>
       </el-dialog>
        <!-- 修改收货数量弹出框 -->
-      <el-dialog title="收货数量" :visible.sync="dialogFormVisible2" width="80%">
+      <el-dialog title="收货数量" :visible.sync="dialogFormVisible2" width="40%">
         <div>
           <el-row class="oneLine">
-            <el-col :span="10"><div class="grid-content inputGroup">
+            <el-col :span="20"><div class="grid-content inputGroup">
                 <el-col :span="6"><div class="inputTitle">已收货：</div></el-col>
                 <el-col :span="18"><el-input v-model="changeData.acceptance_num"></el-input></el-col>
             </div></el-col>
@@ -197,9 +217,13 @@ export default {
         end_date:new Date(),//结束时间
         seller:'',//供应商信息 
         goods_name:'',//商品名
+        buyer:"", //买家信息 
         page:'1',//当前页
-        size:'10'//每页数量
+        size:'50',//每页数量
+        
       },
+      // 输入框数据提示
+      AllBuyerInfo:[],
       // 表格数据
       tableData:[],
       // 总数
@@ -234,6 +258,26 @@ export default {
         that.selectData.status=r.data.data
         that.search()
       })
+    },
+    // 搜索提示
+    querySearchbuyer(queryString, cb){
+      let restaurants = this.AllBuyerInfo;
+      let results = queryString ? restaurants.filter(this.createFilter(queryString,"shop_name")) : restaurants;
+      let a = []
+      results.forEach(function(item,index){
+        a.push({
+          value:item.shop_name,
+          // tel:item.mobile_phone,
+          // addresses:item.addresses
+        })
+      })
+      cb(a);
+    },
+    // 匹配规则
+    createFilter(queryString,type) {
+      return (restaurant) => {
+        return (restaurant[type].toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+      }
     },
     // 请求页面数据
     search(){
@@ -301,22 +345,22 @@ export default {
         var LODOP;
         LODOP=getLodop();  
         LODOP.PRINT_INIT("打印不干胶");  
-        LODOP.SET_PRINT_PAGESIZE(0, 400, (300*that.printDatas.length), 'tag')
+        LODOP.SET_PRINT_PAGESIZE(0, 600, (420*that.printDatas.length), 'tag')
         for(let i = 0;i<that.printDatas.length;i++){
-          LODOP.ADD_PRINT_TEXT((10+i*115),5,260,100,`客户名：${that.printDatas[i].buyer_shop_name}`);
-          LODOP.SET_PRINT_STYLEA(0,"FontSize",5);
-          LODOP.ADD_PRINT_TEXT((10+i*115),95,100,100,`编号：${that.printDatas[i].goods_number}`);
-          LODOP.SET_PRINT_STYLEA(0,"FontSize",4);
-          LODOP.ADD_PRINT_TEXT((35+i*115),5,100,100,`${that.printDatas[i].purchases_num}${that.printDatas[i].sell_unit}`);
-          LODOP.SET_PRINT_STYLEA(0,"FontSize",5);
-          LODOP.ADD_PRINT_TEXT((35+i*115),35,100,100,`${that.printDatas[i].goods_name}`);
-          LODOP.SET_PRINT_STYLEA(0,"FontSize",5);
-          LODOP.ADD_PRINT_TEXT((60+i*115),5,100,100,`合计总数：${that.printDatas[i].total_num}`);
-          LODOP.SET_PRINT_STYLEA(0,"FontSize",4);
-          LODOP.ADD_PRINT_TEXT((85+i*115),5,100,100,`${that.printDatas[i].receipt_area_code}`);
-          LODOP.SET_PRINT_STYLEA(0,"FontSize",7);
-          LODOP.ADD_PRINT_TEXT((85+i*115),55,100,100,`${that.printDatas[i].purchases_date}`);
-          LODOP.SET_PRINT_STYLEA(0,"FontSize",5);
+          LODOP.ADD_PRINT_TEXT((10+i*160),5,130,100,`客户名：${that.printDatas[i].buyer_shop_name}`);
+          LODOP.SET_PRINT_STYLEA(0,"FontSize",10);
+          LODOP.ADD_PRINT_TEXT((10+i*160),125,150,150,`编号：${that.printDatas[i].goods_number}`);
+          LODOP.SET_PRINT_STYLEA(0,"FontSize",10);
+          LODOP.ADD_PRINT_TEXT((65+i*160),5,100,100,`${that.printDatas[i].purchases_num}${that.printDatas[i].sell_unit}`);
+          LODOP.SET_PRINT_STYLEA(0,"FontSize",10);
+          LODOP.ADD_PRINT_TEXT((65+i*160),40,200,100,`${that.printDatas[i].goods_name}`);
+          LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
+          LODOP.ADD_PRINT_TEXT((105+i*160),5,100,100,`合计总数：${that.printDatas[i].total_num}`);
+          LODOP.SET_PRINT_STYLEA(0,"FontSize",8);
+          LODOP.ADD_PRINT_TEXT((130+i*160),5,100,100,`${that.printDatas[i].receipt_area_code}`);
+          LODOP.SET_PRINT_STYLEA(0,"FontSize",10);
+          LODOP.ADD_PRINT_TEXT((130+i*160),55,100,100,`${that.printDatas[i].purchases_date}`);
+          LODOP.SET_PRINT_STYLEA(0,"FontSize",10);
         }
         LODOP.SET_PREVIEW_WINDOW(0,1,0,800,600,"");//打印前弹出选择打印机的对话框	
         LODOP.SET_PRINT_MODE("AUTO_CLOSE_PREWINDOW",1);//打印后自动关闭预览窗口
@@ -402,12 +446,13 @@ export default {
       this.$confirm('是否确认收货?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          type: 'warning'
+          type: 'warning',
+          customClass:"mywarning"
         }).then(() => {
-         this.$axios.post("/provider/allocate/acceptance-num/update",{
+         this.$axios.post("/provider/allocate/acceptance-num/update",[{
             id:data.id,
             acceptance_num:data.purchases_num
-          }).then(function(){
+          }]).then(function(){
             that.$message({
               message: '修改成功！',
               type: 'success'
@@ -419,6 +464,41 @@ export default {
             });
           })
         })
+    },
+    moreSure(){
+      let that = this;
+      if(this.multipleSelection.length==0){
+        this.$message({
+          message: '请选择商品',
+          type: 'warning'
+        });
+        return false;
+      }
+      let params = []
+      this.multipleSelection.forEach((item,index)=>{
+        params.push({
+          id:item.id,
+          acceptance_num:item.purchases_num
+        })
+      })
+      this.$confirm('是否批量确认收货?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        customClass:"mywarning"
+      }).then(() => {
+        this.$axios.post("/provider/allocate/acceptance-num/update",params).then(function(){
+          that.$message({
+            message: '修改成功！',
+            type: 'success'
+          });
+          that.search()
+        }).catch(function(){
+          that.$message.error({
+            message: '修改失败！',
+          });
+        })
+      })
     },
     // 确认打印机
     confirmPrinter(printer){
@@ -434,8 +514,16 @@ export default {
   },
   
   created(){
-    this.getNormalData();
-    // this.LODOP = getLodop();
+    let that = this;
+    that.$axios.get("/custom/lists/all").then( (r)=>{
+      this.AllBuyerInfo = r.data.data
+      this.getNormalData();
+    }).catch((err)=>{
+      console.log(err)
+      this.$message.error({
+        message: '获取买家失败！',
+      });
+    })
   }
 }
 </script>
@@ -445,32 +533,37 @@ export default {
   .mainBox{
     height: 100%;
     background: #fff;
-    .searchArea{
-      margin: 0 10px 10px;
-      padding: 15px 0;
-      display: flex;
-      justify-content: flex-start;
-      &>div{
+    .searchBox{
+      border-bottom: 1px solid #ccc;
+      .searchArea{
+        margin: 0 10px 0px;
+        padding: 5px 0;
         display: flex;
-        justify-content: space-between;
-        span{
-          text-align: right;
-          line-height: 42px;
-          min-width: 65px;
-        }
-        .line{
-          text-align: center;
-          line-height: 42px;
-          margin: 0 5px; 
+        justify-content: flex-start;
+        &>div{
+          margin-left: 10px;
+          display: flex;
+          justify-content: space-between;
+          span{
+            text-align: right;
+            line-height: 42px;
+            min-width: 65px;
+          }
+          .line{
+            text-align: center;
+            line-height: 42px;
+            margin: 0 5px; 
+          }
         }
       }
     }
+    
     .btnGuoup{
       display: flex;
       justify-content: flex-end; 
-      margin: 0 10px 10px;     
+      margin: 0 10px 0px;     
       padding-bottom: 10px;
-      border-bottom: 1px solid #ccc
+      
     }
     .tableArea{
       margin: 10px;
@@ -491,6 +584,7 @@ export default {
         }
       }
     }
+    
     // 打印样式
     #printArea{
       position: fixed;
@@ -523,5 +617,10 @@ export default {
         margin:20px;
       }
     }
+  }
+  .mywarning{
+      
+      font-size: 20px;
+      
   }
 </style>

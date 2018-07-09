@@ -5,7 +5,7 @@
       <!-- 本地 -->
       <!-- <form  id="searchForm" action="/api/provider/purchases/export" method="get" target="_blank"> -->
        <!-- 线上版本 -->
-     <form  id="searchForm" :action="formAction" method="get" target="_blank">
+      <form  id="searchForm" :action="formAction" method="get" target="_blank">
         <div class="searchArea">
           
           <div>
@@ -32,8 +32,22 @@
             <el-input v-model="searchParam.seller" name="seller"></el-input>
           </div>
           <div class="demo-input-suffix">
-            <span>商品名：</span>  
-            <el-input v-model="searchParam.goods_name" name="goods_name"></el-input>
+            <span>商品名：</span> 
+             <el-select
+              v-model="searchParam.goods_name"
+              style="width: 350px;"
+              filterable
+              @visible-change="getShopList"
+              multiple
+              collapse-tags>
+              <el-option
+                v-for="item in selectData.goods"
+                :key="item.value"
+                :label="item.value"
+                :value="item.value">
+              </el-option>
+            </el-select> 
+            <!-- <el-input v-model="searchParam.goods_name" name="goods_name"></el-input> -->
           </div>
         </div>
         <div class="searchArea">
@@ -59,20 +73,23 @@
               </el-option>
             </el-select>
           </div>
-        </div>
-        <!-- 搜索按钮 -->
-        <div class="btnGuoup">
+          <div class="btnGuoup">
+            <el-button type="success" icon="el-icon-search" @click="search">确认</el-button>
             <el-button type="primary" icon="el-icon-edit" @click="moreEdit">批量修改</el-button>
             <el-button type="primary" icon="el-icon-document" @click="exportMsg">导出</el-button>
-            <el-button type="primary" icon="el-icon-search" @click="search">搜索</el-button>
+            
+          </div>
         </div>
+        <!-- 搜索按钮 -->
+     
       </form>
+      <p style="color:#f00;"> 温馨提示：按住shift，可以用滚轮操作横向滚动条</p>
        <!-- 表单 -->
       <div class="tableArea">
         <el-table
           :data="tableData"
           :stripe=true
-          max-height="4000"
+          max-height="5000"
           border
           align="center"
           ref="multipleTable"
@@ -83,17 +100,23 @@
             label="序号"
             type="index"
             align="center"
-            width="50">
+            min-width="40">
           </el-table-column>
            <el-table-column
             fixed
             type="selection"
-            width="55">
+            min-width="40">
+          </el-table-column>
+           <el-table-column
+            prop="goods_number"
+            label="商品编号"
+            min-width="120"
+            align="center">
           </el-table-column>
           <el-table-column
             prop="purchases_date"
             label="采购时间"
-            min-width="120"
+            min-width="80"
             align="center">
           </el-table-column>
           <el-table-column
@@ -105,76 +128,71 @@
           <el-table-column
             prop="buyer_tel"
             label="客户电话"
-            min-width="150"
+            min-width="120"
+            align="center">
+          </el-table-column>
+          <el-table-column
+            prop="seller_shop"
+            label="供应商名称"
+            sortable
+            min-width="120"
             align="center">
           </el-table-column>
           <el-table-column
             prop="seller_tel"
             label="供应商电话"
-            min-width="150"
+            min-width="120"
             align="center">
-          </el-table-column>
-            <el-table-column
-            prop="seller_shop"
-            label="供应商名称"
-            sortable
-            min-width="200"
-            align="center">
-          </el-table-column>
-            <el-table-column
+          </el-table-column> 
+          <el-table-column
             prop="purchases_modeName"
             label="采购方式"
-            min-width="120"
+            min-width="60"
             align="center">
           </el-table-column>
           <el-table-column
             prop="goods_name"
             label="商品名"
-            min-width="200"
-            align="center">
-          </el-table-column>
-          <el-table-column
-            prop="goods_number"
-            label="商品编号"
-            min-width="200"
+            sortable
+            min-width="120"
             align="center">
           </el-table-column>
           <el-table-column
             prop="purchases_num"
             label="采购数量"
-            min-width="80"
+            min-width="60"
             align="center">
           </el-table-column>
           <el-table-column
             prop="purchases_price"
             label="采购价格"
-            min-width="100"
+            min-width="80"
             :formatter="formatter"
             align="center">
           </el-table-column>
           <el-table-column
             prop="goods_sell_price"
             label="销售价格"
-            min-width="100"
+            min-width="80"
             :formatter="formatter"
             align="center">
           </el-table-column>
           <el-table-column
             prop="statusName"
             label="采购状态"
-            min-width="100"
+            min-width="80"
             align="center">
           </el-table-column>
           <el-table-column
             prop="reach_status"
             label="到货状态"
-            min-width="100"
+            min-width="80"
             align="center">
           </el-table-column>
           <el-table-column
             prop="acceptance_num"
             label="到货数量"
-            min-width="100"
+            min-width="80"
             align="center">
           </el-table-column>
           <el-table-column
@@ -199,24 +217,25 @@
       </div>
 
       <!-- 修改供应商弹出框（批量修改） -->
-      <el-dialog title="修改资料" :visible.sync="dialogFormVisible2" width="80%">
-        <div>
+      <el-dialog title="修改资料" :visible.sync="dialogFormVisible2" width="60%">
+
           <el-row class="oneLine">
-            <el-col :span="10"><div class="grid-content inputGroup">
+            <el-col :span="20"><div class="grid-content inputGroup">
                 <el-col :span="6"><div class="inputTitle">供应商名称：</div></el-col>
                 <el-col :span="18"><el-input v-model="changeSellData.seller_shop"></el-input></el-col>
             </div></el-col>
-            <el-col :span="10"><div class="grid-content inputGroup">
+            
+          </el-row>   
+          <el-row class="oneLine">
+            <el-col :span="20"><div class="grid-content inputGroup">
                 <el-col :span="6"><div class="inputTitle">供应商名称电话：</div></el-col>
                 <el-col :span="18"><el-input v-model="changeSellData.seller_tel"></el-input></el-col>
             </div></el-col>
-          </el-row>   
-        </div>
-         <div>
+          </el-row> 
           <el-row class="oneLine">
-            <el-col :span="10">
+            <el-col :span="20">
               <div class="grid-content inputGroup">                
-                <el-col :span="6"><div class="inputTitle">供应商名称：</div></el-col>
+                <el-col :span="6"><div class="inputTitle">采购方式：</div></el-col>
                 <el-col :span="18">
                   <el-select v-model="changeSellData.purchases_mode" clearable placeholder="请选择">
                     <el-option
@@ -230,55 +249,59 @@
               </div>
             </el-col>
           </el-row>   
-        </div>
+
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="changeSeller">确 定</el-button>
           <el-button @click="dialogFormVisible2 = false">取 消</el-button> 
         </div>
       </el-dialog>
        <!-- 修改资料弹出框 -->
-      <el-dialog title="修改资料" :visible.sync="dialogFormVisible" width="80%">
+      <el-dialog title="修改资料" :visible.sync="dialogFormVisible" width="65%">
         <div>
           <el-row class="oneLine">
-            <el-col :span="8"><div class="grid-content inputGroup">
+            <el-col :span="12"><div class="grid-content inputGroup">
                 <el-col :span="6"><div class="inputTitle">客户名称：</div></el-col>
                 <el-col :span="18"><el-input v-model="changeData.buyer_shop_name"></el-input></el-col>
             </div></el-col>
-            <el-col :span="8"><div class="grid-content inputGroup">
+            <el-col :span="12"><div class="grid-content inputGroup">
                 <el-col :span="6"><div class="inputTitle">客户电话：</div></el-col>
                 <el-col :span="18"><el-input v-model="changeData.buyer_tel"></el-input></el-col>
             </div></el-col>
-            <el-col :span="8"><div class="grid-content inputGroup">
+            
+          </el-row>  
+          <el-row class="oneLine">
+            <el-col :span="12"><div class="grid-content inputGroup">
                 <el-col :span="6"><div class="inputTitle">供应商电话：</div></el-col>
                 <el-col :span="18"><el-input v-model="changeData.seller_tel"></el-input></el-col>
             </div></el-col>
-          </el-row>  
-          <el-row class="oneLine">
-            <el-col :span="8"><div class="grid-content inputGroup">
+            <el-col :span="12"><div class="grid-content inputGroup">
                 <el-col :span="6"><div class="inputTitle">供应商名称：</div></el-col>
                 <el-col :span="18"><el-input v-model="changeData.seller_shop"></el-input></el-col>
             </div></el-col>
-            <el-col :span="8"><div class="grid-content inputGroup">
+          </el-row>  
+          <el-row class="oneLine">
+            
+            <el-col :span="12"><div class="grid-content inputGroup">
                 <el-col :span="6"><div class="inputTitle">商品名：</div></el-col>
                 <el-col :span="18"><el-input v-model="changeData.goods_name"></el-input></el-col>
             </div></el-col>
-             <el-col :span="8"><div class="grid-content inputGroup">
+             <el-col :span="12"><div class="grid-content inputGroup">
                 <el-col :span="6"><div class="inputTitle">采购数量：</div></el-col>
                 <el-col :span="18"><el-input v-model="changeData.purchases_num"></el-input></el-col>
             </div></el-col>
           </el-row>
           <el-row class="oneLine">
-            <el-col :span="8"><div class="grid-content inputGroup">
+            <el-col :span="12"><div class="grid-content inputGroup">
                 <el-col :span="6"><div class="inputTitle">采购价格：</div></el-col>
                 <el-col :span="18"><el-input v-model="changeData.purchases_price"></el-input></el-col>
             </div></el-col>
-            <el-col :span="8"><div class="grid-content inputGroup">
+            <el-col :span="12"><div class="grid-content inputGroup">
                 <el-col :span="6"><div class="inputTitle">销售价格：</div></el-col>
                 <el-col :span="18"><el-input v-model="changeData.goods_sell_price"></el-input></el-col>
             </div></el-col>
           </el-row>  
           <el-row class="oneLine">
-            <el-col :span="8"><div class="grid-content inputGroup">
+            <el-col :span="12"><div class="grid-content inputGroup">
                 <el-col :span="6"><div class="inputTitle">采购状态：</div></el-col>
                  <el-col :span="18">
                   <el-select v-model="changeData.status" placeholder="请选择">
@@ -291,7 +314,7 @@
                   </el-select>
                 </el-col>
             </div></el-col>
-            <el-col :span="8"><div class="grid-content inputGroup">
+            <el-col :span="12"><div class="grid-content inputGroup">
                 <el-col :span="6"><div class="inputTitle">采购方式：</div></el-col>
                 <el-col :span="18">
                   <el-select v-model="changeData.purchases_mode" clearable  placeholder="请选择">
@@ -325,11 +348,16 @@ export default {
         start_date:new Date(),//开始时间
         end_date:new Date(),//结束时间
         seller:'',//客户供应商
-        goods_name:'',//商品名
+        goods_name:[],//商品名
         page:1,//当前页
         size:50,//每页数量
         reach_status:'',//到货状态
         status:[]//采购状态
+      },
+      // 获取商品的时间
+      getGoodsTime:{
+        start_date:"",//开始时间
+        end_date:"",//结束时间
       },
       // 下拉框数据
       selectData:{
@@ -339,6 +367,10 @@ export default {
         ],
         // 采购状态
         status:[
+
+        ],
+        // 商品名称
+        goods:[
 
         ],
         // 到货状态
@@ -436,6 +468,39 @@ export default {
         that.search()
       })
     },
+    // 获取商品列表
+    getShopList(val){
+      let that = this;
+      if(!val) return false
+      if(that.searchParam.start_date&&that.searchParam.end_date&&(that.searchParam.end_date>=that.searchParam.end_date)){
+        if(($tools.dateFormat(that.searchParam.start_date)==that.getGoodsTime.start_date)&&($tools.dateFormat(that.searchParam.end_date)==that.getGoodsTime.end_date)) return false;
+        that.searchParam.goods_name=[];
+        that.selectData.goods=[];
+        that.$axios.get("/provider/order/goods/species/list",{
+          params:{
+            start_date:$tools.dateFormat(new Date(that.searchParam.start_date)),
+            end_date:$tools.dateFormat(new Date(that.searchParam.end_date))
+          }
+        }).then(function(r){
+          that.getGoodsTime.start_date=$tools.dateFormat(new Date(that.searchParam.start_date));
+          that.getGoodsTime.end_date=$tools.dateFormat(new Date(that.searchParam.end_date));
+          r.data.data.forEach(function(item,index){
+            that.selectData.goods.push({
+              value:item.goods_name
+            })
+          })
+        }).catch(function(err){
+          console.log(err)
+          that.$message.error({
+            message: '获取商品列表失败！'
+          });
+        })
+      }else{
+        that.$message.error({
+          message: '请选择正取的时间！'
+        });
+      }
+    },
     // 获取当前行的订单详情
     getNowGoods(index, rows) {
       this.goodsInfo = rows[index].goods
@@ -509,7 +574,7 @@ export default {
         this.changeSellData={
           seller_shop:'',//供货商店名
           seller_tel:'',//供货商电话
-          purchases_mode:''
+          purchases_mode:3
         }
       }else{
         this.$message({
@@ -585,12 +650,34 @@ export default {
   .mainBox{
     height: 100%;
     background: #fff;
+    #searchForm{
+      border-bottom: 1px solid #ccc;
+      &>div{
+        height: 50px;
+        span{
+          height: 50px;
+        }
+        div{
+          height: 50px;
+          &.btnGuoup{
+            display: flex;
+            justify-content: flex-end; 
+            margin: 0 10px 0px;     
+            padding-bottom: 10px;
+            height: 40px;
+          }
+        }
+        
+      }
+    }
     .searchArea{
-      margin: 0 10px 0px;
+      margin: 0 10px 0px;  
       padding: 8px 0;
       display: flex;
+      height: 50px !important;
       justify-content: flex-start;
       &>div{
+
         display: flex;
         justify-content: space-between;
         span{
@@ -617,13 +704,7 @@ export default {
     .bigSelect{
       width: 300px;
     }
-    .btnGuoup{
-      display: flex;
-      justify-content: flex-end; 
-      margin: 0 10px 10px;     
-      padding-bottom: 10px;
-      border-bottom: 1px solid #ccc
-    }
+    
     .tableArea{
       margin: 10px;
     }
@@ -635,6 +716,9 @@ export default {
     // 弹出框样式
     .oneLine{
       margin-bottom: 20px;
+      .el-select{
+        width: 100%;
+      }
       .inputGroup{
         .inputTitle{
           text-align: right;

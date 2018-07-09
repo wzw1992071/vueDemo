@@ -3,17 +3,17 @@ import {Loading, Message, MessageBox} from 'element-ui'
 import Axios from 'axios'
 
 let BaseUrl = ""
-if(window.location.hostname=="localhost"){
+if(process.env.NODE_ENV=='development'){
   BaseUrl = "/api"
-}else{
+}else if((process.env.NODE_ENV=='production')){
   BaseUrl = ""
 }
+
 console.log(BaseUrl)
 var axios = Axios.create({
-  baseURL: BaseUrl,//本地开发用，打包注释
+  baseURL: BaseUrl,
   timeout: 30000,
   headers: {
-    // 'X-Custom-Header': 'foobar'
   }
 });
 
@@ -51,7 +51,7 @@ axios.interceptors.response.use(function(res){
     console.log(err)
     loadinginstace.close();
     Message.error({
-        message:"请求失败1"
+        message:"请求失败"
     })
   return Promise.reject(error);
 })
