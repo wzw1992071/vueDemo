@@ -270,7 +270,7 @@ export default {
           var LODOP=getLodop();  
           LODOP.PRINT_INIT("打印销售单"); 
           // LODOP.SET_PRINT_PAGESIZE(0, 2100, 2400, 'bills'); 
-          LODOP.SET_PRINT_PAGESIZE(3,2100,25,"bills")
+          
           for(var j= 0;j<printData.length;j++){
               // 循环开始
             LODOP.ADD_PRINT_TEXT(nowHeight+20,300,500,100,"成都海霸王冻参谋销售单");
@@ -280,7 +280,7 @@ export default {
             LODOP.SET_PRINT_STYLEA(0,"FontSize",12);//距离顶部20加字体加间距总高30
             LODOP.ADD_PRINT_TEXT(nowHeight,250,200,100,`客户电话：${printData[j].order.buyer_tel}`);
             LODOP.SET_PRINT_STYLEA(0,"FontSize",12);//距离顶部20加字体加间距总高30
-            LODOP.ADD_PRINT_TEXT(nowHeight,550,200,100,`编号：${printData[j].order.order_no}`);
+            LODOP.ADD_PRINT_TEXT(nowHeight,550,250,100,`编号：${printData[j].order.order_no}`);
             LODOP.SET_PRINT_STYLEA(0,"FontSize",12);//距离顶部20加字体加间距总高30
             nowHeight+=30;
             LODOP.ADD_PRINT_TEXT(nowHeight,50,400,100,`配送地址：${printData[j].order.receipt_address}`);
@@ -289,7 +289,10 @@ export default {
             LODOP.SET_PRINT_STYLEA(0,"FontSize",12);//距离顶部20加字体加间距总高30
             nowHeight+=30;
             var tableMain = `
-            <style> table,td,th {border-width: 1px;border-style: solid;border-collapse: collapse;text-align:center}</style>
+            <style> 
+              table,td,th {border-width: 1px;border-style: solid;border-collapse: collapse;text-align:center}
+             td{height:50px;overflow:hidden}
+            </style>
             <table style="border-collapse:collapse">
               <tr><td width="20%">品名</td><td width="4%">数量</td><td width="4%">单价</td><td width="4%">合计</td><td width="4%">单位</td></tr>`
             if(printData[j].order.goods.length>9){
@@ -318,7 +321,7 @@ export default {
               }
             }
             tableMain+="</table>"
-            var tableHeight = (printData[j].order.goods.length<9)?240:(22*(printData[j].order.goods.length+1))
+            var tableHeight = (printData[j].order.goods.length<9)?550:(51*(printData[j].order.goods.length+1))
             LODOP.ADD_PRINT_TABLE(nowHeight,50,500,tableHeight,tableMain);
 
             LODOP.ADD_PRINT_TEXT(nowHeight+20,580,200,100,`售后电话：${printData[j].order.after_sale_tel}`);
@@ -339,7 +342,7 @@ export default {
               NogetMoney=printData[j].order.total_money
             }
 
-            nowHeight+=tableHeight
+            nowHeight+=tableHeight+10
             LODOP.ADD_PRINT_TEXT(nowHeight,50,200,100,"备注");
             LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
             nowHeight+=30;
@@ -370,10 +373,10 @@ export default {
             nowHeight+=60;
             // 循环结束
           }
-            
-
+          // LODOP.SET_PRINT_PAGESIZE(0,2100,nowHeight,"")
+          LODOP.SET_PRINT_PAGESIZE(3,2100,45,"")
           LODOP.SET_PRINT_STYLEA(0,"FontSize",12);
-          LODOP.SET_PREVIEW_WINDOW(0,1,0,800,600,"");//打印前弹出选择打印机的对话框	
+          // LODOP.SET_PREVIEW_WINDOW(0,1,0,800,600,"");//打印前弹出选择打印机的对话框	
           LODOP.SET_PRINT_MODE("AUTO_CLOSE_PREWINDOW",1);//打印后自动关闭预览窗口
           LODOP.PREVIEW();	
       })

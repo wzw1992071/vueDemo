@@ -359,10 +359,10 @@ export default {
           LODOP.SET_PRINT_STYLEA(0,"FontSize",8);
           LODOP.ADD_PRINT_TEXT((130+i*160),5,100,100,`${that.printDatas[i].receipt_area_code}`);
           LODOP.SET_PRINT_STYLEA(0,"FontSize",10);
-          LODOP.ADD_PRINT_TEXT((130+i*160),55,100,100,`${that.printDatas[i].purchases_date}`);
+          LODOP.ADD_PRINT_TEXT((130+i*160),105,100,100,`${that.printDatas[i].purchases_date}`);
           LODOP.SET_PRINT_STYLEA(0,"FontSize",10);
         }
-        LODOP.SET_PREVIEW_WINDOW(0,1,0,800,600,"");//打印前弹出选择打印机的对话框	
+        // LODOP.SET_PREVIEW_WINDOW(0,1,0,800,600,"");//打印前弹出选择打印机的对话框	
         LODOP.SET_PRINT_MODE("AUTO_CLOSE_PREWINDOW",1);//打印后自动关闭预览窗口
         LODOP.PREVIEW();	
       }).catch(function(){
