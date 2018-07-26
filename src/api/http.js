@@ -45,6 +45,10 @@ axios.interceptors.response.use(function(res){
       }
     })
   }
+  if(res.data.code > 0){
+    console.log(`请求失败:${res.data.message}`)
+  }
+
   return res;
 },function(err){
   //Do something with response error
