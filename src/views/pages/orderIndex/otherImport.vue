@@ -27,7 +27,7 @@
     </div>
     <div class="checkBoxArea">
       <el-checkbox-group v-model="entryParam.status">
-        <el-checkbox v-for="item in orderStatus"  :label="item.key" :key="item.key">{{item.value}}</el-checkbox>
+        <el-checkbox disabled v-for="item in orderStatus"  :label="item.key" :key="item.key" >{{item.value}}</el-checkbox>
       </el-checkbox-group>
     </div>
      <!-- 导入按钮 -->
@@ -55,17 +55,18 @@ export default {
       // 101=支付成功
       // 102=支付失败
       orderStatus:[
-        {key:1,value:'未确认 新订单'},{key:2,value:'已确认 待发货'},
-        {key:3,value:'已发货 待收货'},{key:4,value:'已收货'},
-        {key:5,value:'已取消'},{key:6,value:'支付成功'},
-        {key:7,value:'支付失败'}
+        // {key:1,value:'未确认 新订单'},{key:2,value:'已确认 待发货'},
+        // {key:3,value:'已发货 待收货'},{key:4,value:'已收货'},
+        // {key:5,value:'已取消'},{key:6,value:'支付成功'},
+        // {key:7,value:'支付失败'}
+        {key:2,value:'已确认 待发货'}
       ],
       // 导入条件
       entryParam:{
         begin:$tools.dateFormat(new Date()),//开始时间
         end:$tools.dateFormat(new Date()),//结束时间
         sp_id:'',//客户名
-        status:[]//选中状态
+        status:[2]//选中状态
       },
       importAdd:''
     }

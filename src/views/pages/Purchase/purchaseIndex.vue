@@ -517,7 +517,7 @@ export default {
     // 编辑功能
     editInfo(data){
       // 将当前行的数据单独保存起来,显示弹窗
-      this.changeData = data
+      this.changeData = JSON.parse(JSON.stringify(data))
       this.changeData.purchases_price = (this.changeData.purchases_price/100).toFixed(2)
       this.changeData.goods_sell_price = (this.changeData.goods_sell_price/100).toFixed(2)
       this.changeDataOld = JSON.parse(JSON.stringify(data))

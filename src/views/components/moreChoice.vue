@@ -58,9 +58,13 @@ export default {
     },
     selectData(){
       var newArr=[]
+      var newArr2=[]
       this.selectAllInfo.forEach(item => {
         if(item.name.indexOf(this.inputValue)>-1){
           newArr.push(item)
+          newArr2.push(item.id)
+          this.AllCheckedData=newArr2
+         
         }
       });
       this.selectInfo = newArr;
