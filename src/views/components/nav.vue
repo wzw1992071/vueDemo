@@ -121,6 +121,21 @@ export default {
                     childs:[
                         {index:"4-1",  name:"销售单打印" ,path:"/printSaleData"}
                     ]
+                },
+                { 
+                    index:"5",  
+                    name:"收款退货",
+                    childs:[
+                        {index:"5-1",  name:"收款退货" ,path:"/saleReturn"},
+                        {index:"5-2",  name:"退货处理" ,path:"/returnHandle"}
+                    ]
+                },
+                 { 
+                    index:"6",  
+                    name:"供应商退货",
+                    childs:[
+                        {index:"6-1",  name:"供应商退货" ,path:"/sellerPayment"}
+                    ]
                 }
                 // ,{ 
                 //     index:"5",  

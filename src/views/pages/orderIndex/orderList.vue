@@ -407,7 +407,7 @@
                     </template>
                 </el-table-column>
                  <el-table-column
-                  prop="goods_sell_price"
+                  prop="totalMoney"
                   label="合计金额"
                   min-width="80"
                   align="center">
@@ -464,160 +464,156 @@
 
 
 <script>
-import '../../../tool.js'
+import "../../../tool.js";
 // import addGoods from 'components/AddGood'
 export default {
-  name: 'OrderList',
-  data () {
+  name: "OrderList",
+  data() {
     return {
       // 弹窗时间避免重复刷新和验证问题
-      openTime:"",
+      openTime: "",
       // 搜索条件
-      searchParam:{
-        start_date:new Date(),//开始时间
-        end_date:new Date(),//结束时间
-        buyer:'',//客户名
-        page:1,//当前页
-        size:50//每页数量
+      searchParam: {
+        start_date: new Date(), //开始时间
+        end_date: new Date(), //结束时间
+        buyer: "", //客户名
+        page: 1, //当前页
+        size: 50 //每页数量
       },
-      dataTotal:0,
+      dataTotal: 0,
       // 下拉框属性
-      selectOptions:{
-        orderTypes:[
-          { value: '0',label: '全部订单'},
-          { value: '1',label: '未完成'},
+      selectOptions: {
+        orderTypes: [
+          { value: "0", label: "全部订单" },
+          { value: "1", label: "未完成" }
         ],
-        province_id:[],
-        city_id:[],
-        county_id:[],
-        pay_mode:[] //支付方式
+        province_id: [],
+        city_id: [],
+        county_id: [],
+        pay_mode: [] //支付方式
       },
       // 表格数据
-      tableData:[
-       
-      ],
-      
-      
+      tableData: [],
+
       // 弹出框订单详情数据
-      goodsInfo:[],
+      goodsInfo: [],
       // 订单添加商品相关操作
       // 是否显示
-      dialogFormVisible1:false,
+      dialogFormVisible1: false,
       // 添加商品信息
-      addGoodsInfo:{
-        order:'', //订单编号
-        goods:[
-        ]
+      addGoodsInfo: {
+        order: "", //订单编号
+        goods: []
       },
       // 添加商品模板
-      goodsDemo:{
-        goods_name:'', //商品名称
-        goods_sell_price:0, //商品销售价格
-        buy_num:0, //	购买数量
-        sell_unit:"", //	商品售出单位
-        seller_shop:'', //	供应商店铺名
-        seller_tel:'' ,//	供应商联系电话
-        totalMoney:'',
-        goods_type:'无', //商品分类
-        seller_address:'空', //供应商地址
-        original_price:0 //商品原价
+      goodsDemo: {
+        goods_name: "", //商品名称
+        goods_sell_price: 0, //商品销售价格
+        buy_num: 0, //	购买数量
+        sell_unit: "", //	商品售出单位
+        seller_shop: "", //	供应商店铺名
+        seller_tel: "", //	供应商联系电话
+        totalMoney: "",
+        goods_type: "无", //商品分类
+        seller_address: "空", //供应商地址
+        original_price: 0 //商品原价
       },
       // 添加订单相关操作
-      dialogFormVisible2:false,
-       // 搜索商铺输入建议
-      allShopInfo:[],
-       // 搜索商铺电话输入建议
-      shopAddressList:[],
-       // 搜索商品输入建议
-      allGoodsList:[],
+      dialogFormVisible2: false,
+      // 搜索商铺输入建议
+      allShopInfo: [],
+      // 搜索商铺电话输入建议
+      shopAddressList: [],
+      // 搜索商品输入建议
+      allGoodsList: [],
       // 当前输入行
-      changeRowIndex:0,
+      changeRowIndex: 0,
       // 添加订单信息
-      addOrderInfo:{
-        order:{
-          buyer_shop_name:"", //采购商店铺名
-          buyer_tel:"", //采购商联系电话
-          receipt_address:"", //收货地址
-          freight:"", //商品运费
-          pay_mode:"1", //支付模式
-          province_id:"", //买家所在省ID
-          city_id:"", //	买家所在市ID
-          county_id:"", //买家所在区县ID
-          receipt_area:"", 	//配送区域 如：金牛区
-          receipt_area_code:"", //配送区域代号 如：Y_1
-          consign_date:""
+      addOrderInfo: {
+        order: {
+          buyer_shop_name: "", //采购商店铺名
+          buyer_tel: "", //采购商联系电话
+          receipt_address: "", //收货地址
+          freight: "", //商品运费
+          pay_mode: "1", //支付模式
+          province_id: "", //买家所在省ID
+          city_id: "", //	买家所在市ID
+          county_id: "", //买家所在区县ID
+          receipt_area: "", //配送区域 如：金牛区
+          receipt_area_code: "", //配送区域代号 如：Y_1
+          consign_date: ""
         },
-        goods:[
-        ]
+        goods: []
       },
-      rules:{
+      rules: {
         buyer_shop_name: [
-          { required: true, message: '店铺名不能为空!', trigger: 'blur' },
+          { required: true, message: "店铺名不能为空!", trigger: "blur" }
         ],
         buyer_tel: [
-          { required: true, message: '采购商电话不能为空!', trigger: 'blur' },
-          { len:11, message: '请输入正确的电话！', trigger: 'blur' }
+          { required: true, message: "采购商电话不能为空!", trigger: "blur" },
+          { len: 11, message: "请输入正确的电话！", trigger: "blur" }
         ],
         receipt_address: [
-            { required: true, message: '收货地址不能为空!', trigger: 'blur' },
+          { required: true, message: "收货地址不能为空!", trigger: "blur" }
         ],
         freight: [
-            { required: true, message: '商品运费不能为空!', trigger: 'blur' },
+          { required: true, message: "商品运费不能为空!", trigger: "blur" }
         ],
         pay_mode: [
-            { required: true, message: '支付模式不能为空!', trigger: 'blur' },
+          { required: true, message: "支付模式不能为空!", trigger: "blur" }
         ],
         province_id: [
-            { required: true, message: '买家所在省不能为空!', trigger: 'blur' },
+          { required: true, message: "买家所在省不能为空!", trigger: "blur" }
         ],
         city_id: [
-            { required: true, message: '买家所在市不能为空!', trigger: 'blur' },
+          { required: true, message: "买家所在市不能为空!", trigger: "blur" }
         ],
         county_id: [
-            { required: true, message: '买家所在区县不能为空!', trigger: 'blur' },
+          { required: true, message: "买家所在区县不能为空!", trigger: "blur" }
         ],
         receipt_area_code: [
-            { required: true, message: '配送区域不能为空!', trigger: 'blur' },
-            { min: 1, max: 5, message: '请输入正确的配送区域！', trigger: 'blur' }
-        ],
+          { required: true, message: "配送区域不能为空!", trigger: "blur" },
+          { min: 1, max: 5, message: "请输入正确的配送区域！", trigger: "blur" }
+        ]
       }
-    }
+    };
   },
   components: {
-  //  addGoods
+    //  addGoods
   },
-  methods:{
+  methods: {
     // 表格数据过滤
     formatter(row, column) {
-        return (row[column.property]/100).toFixed(2)
+      return (row[column.property] / 100).toFixed(2);
     },
     // 请求页面数据
-    search(){
-      let that= this
-      let sendParamStr = JSON.stringify(this.searchParam)
-      let sendParam = JSON.parse(sendParamStr)
-      if(sendParam.start_date){
-        sendParam.start_date=$tools.dateFormat(sendParam.start_date)
+    search() {
+      let that = this;
+      let sendParamStr = JSON.stringify(this.searchParam);
+      let sendParam = JSON.parse(sendParamStr);
+      if (sendParam.start_date) {
+        sendParam.start_date = $tools.dateFormat(sendParam.start_date);
       }
-      if(sendParam.end_date){
-        sendParam.end_date=$tools.dateFormat(sendParam.end_date)
+      if (sendParam.end_date) {
+        sendParam.end_date = $tools.dateFormat(sendParam.end_date);
       }
-      for(let i in sendParam ){
-        if(!sendParam[i]){
+      for (let i in sendParam) {
+        if (!sendParam[i]) {
           delete sendParam[i];
         }
       }
-      this.$axios.get('/provider/allocate/order/list',{params: sendParam})
-      .then(function(r){
-        that.tableData = r.data.data.orders
-        that.dataTotal = r.data.data.total
-      })
-      .catch(function(){
-        console.log("获取数据失败")
-      })
+      this.$axios
+        .get("/provider/allocate/order/list", { params: sendParam })
+        .then(function(r) {
+          that.tableData = r.data.data.orders;
+          that.dataTotal = r.data.data.total;
+        })
+        .catch(function() {
+          console.log("获取数据失败");
+        });
     },
     // 页面跳转
-    pageChange(page){
+    pageChange(page) {
       this.searchParam.page = page;
       this.search();
     },
@@ -627,482 +623,523 @@ export default {
       this.goodsInfo = rows[index].goods;
     },
     // 给一个订单添加商品
-    addGoods(row){
-      this.openTime=new Date().getTime();
+    addGoods(row) {
+      this.openTime = new Date().getTime();
       this.addGoodsInfo.order = row.order_no;
-      this.addGoodsInfo.goods=[];
+      this.addGoodsInfo.goods = [];
       this.addGoodsInfo.goods.push(JSON.parse(JSON.stringify(this.goodsDemo)));
-      this.dialogFormVisible1 = true
+      this.dialogFormVisible1 = true;
     },
     // 添加商品中增加一个商品
-    addOneGood(){
+    addOneGood() {
       this.addGoodsInfo.goods.push(JSON.parse(JSON.stringify(this.goodsDemo)));
     },
     // 添加商品中删除一个商品
-    deleteOneGood(i){
-      this.addGoodsInfo.goods.delete(i)
-      if(this.addGoodsInfo.goods.length == 0){
-        this.addGoodsInfo.goods.push(JSON.parse(JSON.stringify(this.goodsDemo)));
+    deleteOneGood(i) {
+      this.addGoodsInfo.goods.delete(i);
+      if (this.addGoodsInfo.goods.length == 0) {
+        this.addGoodsInfo.goods.push(
+          JSON.parse(JSON.stringify(this.goodsDemo))
+        );
       }
     },
     // 添加商品中的自动填充
-    handleSelectGoods2(value){
-      this.addGoodsInfo.goods[this.changeRowIndex].goods_sell_price = value.goods_sell_price/100
-      this.addGoodsInfo.goods[this.changeRowIndex].sell_unit = value.sell_unit
-      this.addGoodsInfo.goods[this.changeRowIndex].seller_shop = value.seller_shop
-      this.addGoodsInfo.goods[this.changeRowIndex].seller_tel = value.seller_tel
-      this.addGoodsInfo.goods[this.changeRowIndex].goods_type = value.goods_type
-      this.addGoodsInfo.goods[this.changeRowIndex].seller_address = value.seller_address
-      this.addGoodsInfo.goods[this.changeRowIndex].original_price = value.original_price/100
+    handleSelectGoods2(value) {
+      this.addGoodsInfo.goods[this.changeRowIndex].goods_sell_price =
+        value.goods_sell_price / 100;
+      this.addGoodsInfo.goods[this.changeRowIndex].sell_unit = value.sell_unit;
+      this.addGoodsInfo.goods[this.changeRowIndex].seller_shop =
+        value.seller_shop;
+      this.addGoodsInfo.goods[this.changeRowIndex].seller_tel =
+        value.seller_tel;
+      this.addGoodsInfo.goods[this.changeRowIndex].goods_type =
+        value.goods_type;
+      this.addGoodsInfo.goods[this.changeRowIndex].seller_address =
+        value.seller_address;
+      this.addGoodsInfo.goods[this.changeRowIndex].original_price =
+        value.original_price / 100;
     },
     // 添加商品中计算总价
-    sumMoney2(i){
+    sumMoney2(i) {
       // console.log(i)
-      this.addGoodsInfo.goods[i].totalMoney = this.addGoodsInfo.goods[i].goods_sell_price*this.addGoodsInfo.goods[i].buy_num
+      this.addGoodsInfo.goods[i].totalMoney =
+        this.addGoodsInfo.goods[i].goods_sell_price *
+        this.addGoodsInfo.goods[i].buy_num;
     },
     // 提交增加商品
-    submitAddGoods(){
+    submitAddGoods() {
       let flag = true;
-      let that=this;
+      let that = this;
       // this.$refs.Goodform.forEach(function(value,i){
       //   let a = value.validateForm()
       //   if(!a){
       //     flag=false
       //   }
       // })
-      if(flag){
-        this.addGoodsInfo.goods.forEach(function(value,i){
-          value.goods_sell_price= value.goods_sell_price*100
-          value.original_price= value.original_price*100
-        })
-        this.$axios.post("/provider/allocation/order/goods/add",that.addGoodsInfo)
-        .then(function(r){
-          if(r.data.code==0){
-            that.$message({
-              message: '添加成功！',
-              type: 'success'
-            });
-            that.search()
-            that.dialogFormVisible1 = false
-          }else{
-            that.$message.error({
-              message: '添加失败！',
-            });
-            that.addGoodsInfo.goods.forEach(function(value,i){
-              value.goods_sell_price= value.goods_sell_price/100
-              value.original_price= value.original_price/100
-            })
-          }
-         
-        }).catch(function(){
-          that.$message.error({
-            message: '添加失败！',
-          });
-          that.addGoodsInfo.goods.forEach(function(value,i){
-            value.goods_sell_price= value.goods_sell_price/100
-            value.original_price= value.original_price/100
+      if (flag) {
+        this.addGoodsInfo.goods.forEach(function(value, i) {
+          value.goods_sell_price = value.goods_sell_price * 100;
+          value.original_price = value.original_price * 100;
+        });
+        this.$axios
+          .post("/provider/allocation/order/goods/add", that.addGoodsInfo)
+          .then(function(r) {
+            if (r.data.code == 0) {
+              that.$message({
+                message: "添加成功！",
+                type: "success"
+              });
+              that.search();
+              that.dialogFormVisible1 = false;
+            } else {
+              that.$message.error({
+                message: "添加失败！"
+              });
+              that.addGoodsInfo.goods.forEach(function(value, i) {
+                value.goods_sell_price = value.goods_sell_price / 100;
+                value.original_price = value.original_price / 100;
+              });
+            }
           })
-        })
-      }else{
-        this.$message.error('请完善资料！');
-        return false
+          .catch(function() {
+            that.$message.error({
+              message: "添加失败！"
+            });
+            that.addGoodsInfo.goods.forEach(function(value, i) {
+              value.goods_sell_price = value.goods_sell_price / 100;
+              value.original_price = value.original_price / 100;
+            });
+          });
+      } else {
+        this.$message.error("请完善资料！");
+        return false;
       }
     },
     // 添加订单
-    addOrder(){
+    addOrder() {
       this.dialogFormVisible2 = true;
-      this.openTime=new Date().getTime();
-      this.addOrderInfo={
-        order:{
-          buyer_shop_name:"", 
-          buyer_tel:"", 
-          receipt_address:"", 
-          freight:0, 
-          pay_mode:"1", 
-          province_id:"",
-          city_id:"", 
-          county_id:"", 
-          receipt_area:"", 	
-          receipt_area_code:"" ,
-          consign_date:new Date()
+      this.openTime = new Date().getTime();
+      this.addOrderInfo = {
+        order: {
+          buyer_shop_name: "",
+          buyer_tel: "",
+          receipt_address: "",
+          freight: 0,
+          pay_mode: "1",
+          province_id: "",
+          city_id: "",
+          county_id: "",
+          receipt_area: "",
+          receipt_area_code: "",
+          consign_date: new Date()
         },
-        goods:[
-        ]
-      }
+        goods: []
+      };
       this.addOrderInfo.goods.push(JSON.parse(JSON.stringify(this.goodsDemo)));
     },
     // 订单添加一个商品
-    orderAddOneGood(){
+    orderAddOneGood() {
       this.addOrderInfo.goods.push(JSON.parse(JSON.stringify(this.goodsDemo)));
     },
     // 添加商品中删除一个商品
-    deleteOrderOneGood(i){
-      this.addOrderInfo.goods.delete(i)
-      if(this.addOrderInfo.goods.length == 0){
-        this.addOrderInfo.goods.push(JSON.parse(JSON.stringify(this.goodsDemo)));
+    deleteOrderOneGood(i) {
+      this.addOrderInfo.goods.delete(i);
+      if (this.addOrderInfo.goods.length == 0) {
+        this.addOrderInfo.goods.push(
+          JSON.parse(JSON.stringify(this.goodsDemo))
+        );
       }
     },
     // 省市区3级联动
-    provinceChange(){
+    provinceChange() {
       let that = this;
       // 清空省则清空市区
-      that.addOrderInfo.order.city_id='';
-      that.addOrderInfo.order.county_id='';
-      that.selectOptions.city_id=[];
-      that.selectOptions.county_id=[];
-      if(that.addOrderInfo.order.province_id){
-        that.$axios.get(`/api/other/children/${that.addOrderInfo.order.province_id}`).then(function(r){
-          r.data.data.forEach(item => {
-            that.selectOptions.city_id.push({
-              value: item.id,
-              label: item.name
-            })
+      that.addOrderInfo.order.city_id = "";
+      that.addOrderInfo.order.county_id = "";
+      that.selectOptions.city_id = [];
+      that.selectOptions.county_id = [];
+      if (that.addOrderInfo.order.province_id) {
+        that.$axios
+          .get(`/api/other/children/${that.addOrderInfo.order.province_id}`)
+          .then(function(r) {
+            r.data.data.forEach(item => {
+              that.selectOptions.city_id.push({
+                value: item.id,
+                label: item.name
+              });
+            });
           })
-        }).catch(function(err){
-          console.log(err)
-          that.$message.error({
-            message: '获市编码失败！',
+          .catch(function(err) {
+            console.log(err);
+            that.$message.error({
+              message: "获市编码失败！"
+            });
           });
-        })
-      }else{
-        
-        
+      } else {
       }
     },
-    cityChange(){
+    cityChange() {
       let that = this;
-      // 清空市则清空区 
-      that.addOrderInfo.order.county_id='';
-      that.selectOptions.county_id=[];
-      if(that.addOrderInfo.order.city_id){
-        that.$axios.get(`/api/other/children/${that.addOrderInfo.order.city_id}`).then(function(r){
-          r.data.data.forEach(item => {
-            that.selectOptions.county_id.push({
-              value: item.id,
-              label: item.name
-            })
+      // 清空市则清空区
+      that.addOrderInfo.order.county_id = "";
+      that.selectOptions.county_id = [];
+      if (that.addOrderInfo.order.city_id) {
+        that.$axios
+          .get(`/api/other/children/${that.addOrderInfo.order.city_id}`)
+          .then(function(r) {
+            r.data.data.forEach(item => {
+              that.selectOptions.county_id.push({
+                value: item.id,
+                label: item.name
+              });
+            });
           })
-        }).catch(function(err){
-          console.log(err)
-          that.$message.error({
-            message: '获市编码失败！',
+          .catch(function(err) {
+            console.log(err);
+            that.$message.error({
+              message: "获市编码失败！"
+            });
           });
-        })  
-        
-      }else{
-        
+      } else {
       }
     },
-    countyChange(val){
+    countyChange(val) {
       let that = this;
-      if(that.addOrderInfo.order.county_id){
-        let a = that.selectOptions.county_id.filter(item =>(item.value == that.addOrderInfo.order.county_id))
+      if (that.addOrderInfo.order.county_id) {
+        let a = that.selectOptions.county_id.filter(
+          item => item.value == that.addOrderInfo.order.county_id
+        );
         that.addOrderInfo.order.receipt_area = a[0].label;
-      }else{
-        that.addOrderInfo.order.receipt_area = ""
+      } else {
+        that.addOrderInfo.order.receipt_area = "";
       }
     },
 
-    submitAddOrder(){
+    submitAddOrder() {
       let flag = true;
-      let that=this;
-      that.$refs["orderForm"].validate((valid) => {
-          flag = valid
+      let that = this;
+      that.$refs["orderForm"].validate(valid => {
+        flag = valid;
       });
-      if(flag){
-        that.addOrderInfo.order.consign_date = $tools.dateFormat(that.addOrderInfo.order.consign_date)
-        that.addOrderInfo.order.freight=that.addOrderInfo.order.freight*100;
-        that.addOrderInfo.goods.forEach(function(value,i){
-          value.goods_sell_price= value.goods_sell_price*100
-          value.original_price= value.original_price*100
-        })
-        this.$axios.post("/provider/allocation/order/add",that.addOrderInfo)
-        .then(function(r){
-          if(r.data.code==0){
-            that.$message({
-              message: '添加成功！',
-              type: 'success'
-            });
-            that.search()
-            that.dialogFormVisible2 = false
-          }else{
-            that.$message.error({
-              message: '添加失败！'
-            });
-            that.addOrderInfo.order.freight=that.addOrderInfo.order.freight/100;
-            that.addOrderInfo.order.consign_date = new Date(that.addOrderInfo.order.consign_date)
-            that.addOrderInfo.goods.forEach(function(value,i){
-              value.goods_sell_price= value.goods_sell_price/100
-              value.original_price= value.original_price/100
-            })
-          }
-        }).catch(function(){
-          that.$message.error({
-            message: '添加失败！'
-          });
-          that.addOrderInfo.order.consign_date = new Date(that.addOrderInfo.order.consign_date)
-          that.addOrderInfo.order.freight=that.addOrderInfo.order.freight/100;
-          that.addOrderInfo.goods.forEach(function(value,i){
-            value.goods_sell_price= value.goods_sell_price/100
-            value.original_price= value.original_price/100
+      if (flag) {
+        that.addOrderInfo.order.consign_date = $tools.dateFormat(
+          that.addOrderInfo.order.consign_date
+        );
+        that.addOrderInfo.order.freight = that.addOrderInfo.order.freight * 100;
+        that.addOrderInfo.goods.forEach(function(value, i) {
+          value.goods_sell_price = value.goods_sell_price * 100;
+          value.original_price = value.original_price * 100;
+        });
+        this.$axios
+          .post("/provider/allocation/order/add", that.addOrderInfo)
+          .then(function(r) {
+            if (r.data.code == 0) {
+              that.$message({
+                message: "添加成功！",
+                type: "success"
+              });
+              that.search();
+              that.dialogFormVisible2 = false;
+            } else {
+              that.$message.error({
+                message: "添加失败！"
+              });
+              that.addOrderInfo.order.freight =
+                that.addOrderInfo.order.freight / 100;
+              that.addOrderInfo.order.consign_date = new Date(
+                that.addOrderInfo.order.consign_date
+              );
+              that.addOrderInfo.goods.forEach(function(value, i) {
+                value.goods_sell_price = value.goods_sell_price / 100;
+                value.original_price = value.original_price / 100;
+              });
+            }
           })
-        })
-      }else{
-        that.$message.error('请完善资料！');
-        return false
+          .catch(function() {
+            that.$message.error({
+              message: "添加失败！"
+            });
+            that.addOrderInfo.order.consign_date = new Date(
+              that.addOrderInfo.order.consign_date
+            );
+            that.addOrderInfo.order.freight =
+              that.addOrderInfo.order.freight / 100;
+            that.addOrderInfo.goods.forEach(function(value, i) {
+              value.goods_sell_price = value.goods_sell_price / 100;
+              value.original_price = value.original_price / 100;
+            });
+          });
+      } else {
+        that.$message.error("请完善资料！");
+        return false;
       }
     },
     // 添加订单中商铺名的匹配
-    querySearchName(queryString, cb){
+    querySearchName(queryString, cb) {
       let restaurants = this.allShopInfo;
-      let results = queryString ? restaurants.filter(this.createFilter(queryString,"shop_name")) : restaurants;
-      let a = []
-      results.forEach(function(item,index){
+      let results = queryString
+        ? restaurants.filter(this.createFilter(queryString, "shop_name"))
+        : restaurants;
+      let a = [];
+      results.forEach(function(item, index) {
         a.push({
-          value:item.shop_name,
-          tel:item.mobile_phone,
-          id:item.id
-        })
-      })
+          value: item.shop_name,
+          tel: item.mobile_phone,
+          id: item.id
+        });
+      });
       cb(a);
     },
-    handleSelectName(value){
-      let that =this
-      this.addOrderInfo.order.buyer_tel = value.tel
-      this.$axios.get('/custom/address/lists',{
-        params:{id:value.id}
-      }).then(r=>{
-        if(r.data.code==0){
-          this.shopAddressList = r.data.data
-          this.addOrderInfo.order.receipt_address=r.data.data[0].full_address
-        }
-      })
-      
+    handleSelectName(value) {
+      let that = this;
+      this.addOrderInfo.order.buyer_tel = value.tel;
+      this.$axios
+        .get("/custom/address/lists", {
+          params: { id: value.id }
+        })
+        .then(r => {
+          if (r.data.code == 0) {
+            this.shopAddressList = r.data.data;
+            this.addOrderInfo.order.receipt_address =
+              r.data.data[0].full_address;
+          }
+        });
     },
     // 添加订单中商铺名的匹配
-    querySearchTel(queryString, cb){
+    querySearchTel(queryString, cb) {
       let restaurants = this.allShopInfo;
-      let results = queryString ? restaurants.filter(this.createFilter(queryString,"mobile_phone")) : restaurants;
-      let a = []
-      results.forEach(function(item,index){
+      let results = queryString
+        ? restaurants.filter(this.createFilter(queryString, "mobile_phone"))
+        : restaurants;
+      let a = [];
+      results.forEach(function(item, index) {
         a.push({
-          value:`${item.shop_name} - ${item.mobile_phone}`,
-          shop_name:item.shop_name,
-          tel:item.mobile_phone,
-          id:item.id
-        })
-      })
-     
+          value: `${item.shop_name} - ${item.mobile_phone}`,
+          shop_name: item.shop_name,
+          tel: item.mobile_phone,
+          id: item.id
+        });
+      });
+
       cb(a);
-      
     },
-    handleSelectTel(value){
-      this.addOrderInfo.order.buyer_shop_name = value.shop_name
-      this.addOrderInfo.order.buyer_tel = value.tel
-      this.shopAddressList = value.address
-      this.addOrderInfo.order.receipt_address=value.addresses[0].full_address
+    handleSelectTel(value) {
+      this.addOrderInfo.order.buyer_shop_name = value.shop_name;
+      this.addOrderInfo.order.buyer_tel = value.tel;
+      this.shopAddressList = value.address;
+      this.addOrderInfo.order.receipt_address = value.addresses[0].full_address;
       this.$refs["valInput2"].$el.querySelectorAll("input")[0].focus();
       this.$refs["valInput2"].$el.querySelectorAll("input")[0].blur();
       // this.$refs["orderForm"].validate()
     },
     // 添加订单中店铺地址匹配
-    querySearchAddress(queryString, cb){
+    querySearchAddress(queryString, cb) {
       let restaurants = this.shopAddressList;
-      let results = queryString ? restaurants.filter(this.createFilter(queryString,"full_address")) : restaurants;
-      let a = []
-      results.forEach(function(item,index){
+      let results = queryString
+        ? restaurants.filter(this.createFilter(queryString, "full_address"))
+        : restaurants;
+      let a = [];
+      results.forEach(function(item, index) {
         a.push({
-          value:item.full_address
-        })
-      })
+          value: item.full_address
+        });
+      });
       cb(a);
     },
-    handleSelectAddress(value){
+    handleSelectAddress(value) {
       this.$refs["valInput"].$el.querySelectorAll("input")[0].focus();
       this.$refs["valInput"].$el.querySelectorAll("input")[0].blur();
-      
+
       // console.log(this.$refs["valInput"])
       // this.$refs["orderForm"].validate()
     },
     // 添加商品规则
-    querySearchGoods(queryString, cb){
+    querySearchGoods(queryString, cb) {
       let restaurants = this.allGoodsList;
-      let results = queryString ? restaurants.filter(this.createFilter(queryString,"goods_name")) : restaurants;
-      let a = []
-      results.forEach(function(item,index){
+      let results = queryString
+        ? restaurants.filter(this.createFilter(queryString, "goods_name"))
+        : restaurants;
+      let a = [];
+      results.forEach(function(item, index) {
         a.push({
-          value:item.goods_name,
-          goods_sell_price:item.goods_sell_price,
-          sell_unit:item.sell_unit,
-          seller_shop:item.seller_shop,
-          seller_tel:item.seller_tel,
-          goods_type:item.goods_type,
-          seller_address:item.seller_address,
-          original_price:item.original_price
-        })
-      })
+          value: item.goods_name,
+          goods_sell_price: item.goods_sell_price,
+          sell_unit: item.sell_unit,
+          seller_shop: item.seller_shop,
+          seller_tel: item.seller_tel,
+          goods_type: item.goods_type,
+          seller_address: item.seller_address,
+          original_price: item.original_price
+        });
+      });
       cb(a);
     },
-    handleSelectGoods(value){
-      this.addOrderInfo.goods[this.changeRowIndex].goods_sell_price = value.goods_sell_price/100
-      this.addOrderInfo.goods[this.changeRowIndex].sell_unit = value.sell_unit
-      this.addOrderInfo.goods[this.changeRowIndex].seller_shop = value.seller_shop
-      this.addOrderInfo.goods[this.changeRowIndex].seller_tel = value.seller_tel
-      this.addOrderInfo.goods[this.changeRowIndex].goods_type = value.goods_type
-      this.addOrderInfo.goods[this.changeRowIndex].seller_address = value.seller_address
-      this.addOrderInfo.goods[this.changeRowIndex].original_price = value.original_price/100
+    handleSelectGoods(value) {
+      this.addOrderInfo.goods[this.changeRowIndex].goods_sell_price =
+        value.goods_sell_price / 100;
+      this.addOrderInfo.goods[this.changeRowIndex].sell_unit = value.sell_unit;
+      this.addOrderInfo.goods[this.changeRowIndex].seller_shop =
+        value.seller_shop;
+      this.addOrderInfo.goods[this.changeRowIndex].seller_tel =
+        value.seller_tel;
+      this.addOrderInfo.goods[this.changeRowIndex].goods_type =
+        value.goods_type;
+      this.addOrderInfo.goods[this.changeRowIndex].seller_address =
+        value.seller_address;
+      this.addOrderInfo.goods[this.changeRowIndex].original_price =
+        value.original_price / 100;
     },
     // 得到当前行
-    getRow(i){
-      this.changeRowIndex = i
-      
+    getRow(i) {
+      this.changeRowIndex = i;
     },
     // 计算总价
-    sumMoney(i){
-      this.addOrderInfo.goods[i].totalMoney = this.addOrderInfo.goods[i].goods_sell_price*this.addOrderInfo.goods[i].buy_num
+    sumMoney(i) {
+      this.addOrderInfo.goods[i].totalMoney =
+        this.addOrderInfo.goods[i].goods_sell_price *
+        this.addOrderInfo.goods[i].buy_num;
     },
 
     // 匹配规则
-    createFilter(queryString,type) {
-      return (restaurant) => {
-        return (restaurant[type].toLowerCase().indexOf(queryString.toLowerCase()) === 0)
-      }
+    createFilter(queryString, type) {
+      return restaurant => {
+        return (
+          restaurant[type].toLowerCase().indexOf(queryString.toLowerCase()) ===
+          0
+        );
+      };
     }
-     
-    
   },
-  created(){
+  created() {
     let that = this;
     let a = that.$axios.get("/provider/payments");
     let b = that.$axios.get("/api/other/provinces");
     let c = that.$axios.get("/custom/lists/all");
-    Promise.all([a,b,c])
-    .then(function(r){
-      // 获取省份ID
-      r[1].data.data.forEach(item => {
-        that.selectOptions.province_id.push({
-          value: item.id,
-          label: item.name
-        })
+    Promise.all([a, b, c])
+      .then(function(r) {
+        // 获取省份ID
+        r[1].data.data.forEach(item => {
+          that.selectOptions.province_id.push({
+            value: item.id,
+            label: item.name
+          });
+        });
+        // 获取支付方式
+        for (let i in r[0].data.data) {
+          that.selectOptions.pay_mode.push({
+            value: i,
+            label: r[0].data.data[i]
+          });
+        }
+        that.allShopInfo = r[2].data.data;
+        // console.log(r[2].data.data)
+        that.search();
+      })
+      .catch(function(err) {
+        console.log(err);
+        that.$message.error({
+          message: "获取生成订单信息失败！"
+        });
       });
-      // 获取支付方式
-      for(let i in r[0].data.data){
-        that.selectOptions.pay_mode.push({
-          value: i,
-          label: r[0].data.data[i]
-        })
-      }
-      that.allShopInfo = r[2].data.data
-      // console.log(r[2].data.data)
-      that.search()
-    }).catch(function(err){
-      console.log(err)
-      that.$message.error({
-        message: '获取生成订单信息失败！',
+    that.$axios
+      .get("/provider/species/order/goods", {
+        params: {
+          start_date: $tools.dateFormat3m(new Date()),
+          end_date: $tools.dateFormat(new Date())
+        }
+      })
+      .then(function(r) {
+        that.allGoodsList = r.data.data;
+      })
+      .catch(function(err) {
+        console.log(err);
+        that.$message.error({
+          message: "获取添加商品列表失败！"
+        });
       });
-    })
-    that.$axios.get("/provider/species/order/goods",{
-      params:{
-        start_date:$tools.dateFormat3m(new Date()),
-        end_date:$tools.dateFormat(new Date())
-      }
-    }).then(function(r){
-      that.allGoodsList = r.data.data
-    }).catch(function(err){
-      console.log(err)
-      that.$message.error({
-        message: '获取添加商品列表失败！',
-      });
-    })
-
-    
   }
-}
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
-  .mainBox{
-    height: 100%;
-    background: #fff;
-    .el-select{
-      width: 100%;
-    }
-    .el-date-editor{
-      width: 100%;
-    }
-    .el-autocomplete{
-      width: 100%;
-    }
-    .searchArea{
-      margin: 0 10px;
-      padding: 10px 10px 0px;
-      display: flex;
-      justify-content: flex-start;
-      border-bottom: 1px solid #ccc;
-      &>div{
-        display: flex;
-        justify-content: space-between;
-        span{
-          text-align: right;
-          line-height: 42px;
-          min-width: 65px;
-        }
-        .line{
-          text-align: center;
-          line-height: 42px;
-          margin: 0 5px;
-          
-        }
-        
-      }
-    }
-    .btnGuoup{
-      display: flex;
-      justify-content: flex-end; 
-      margin: 0 10px 10px;     
-      padding-bottom: 10px;
-      
-    }
-    .btnGuoup2{
-      display: flex;
-      justify-content: flex-end; 
-      margin: 20px 50px 10px;     
-      padding-bottom: 10px;
-    }
-    .tableArea{
-      margin: 10px;
-    }
-    .pageControl{
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 20px;
-    }
-    .addGoodsForm{
-      margin-top: -30px;
-      max-height: 630px;
-      overflow-y: scroll;
-      .GoodsTitle{
-        font-size: 16px;
-        margin: 10px 0;
-        .deleteGoodsBtn{
-          cursor: pointer;
-          &:hover{
-            color: #E81123;
-          }
-        }
-      }
-      .oneLine{
-        margin-bottom: 20px;
-        .inputGroup{
-          .inputTitle{
-            text-align: right;
-            padding-right:15px ;
-            line-height: 40px;
-          }
-        }
-      }
-    }
-    
+.mainBox {
+  height: 100%;
+  background: #fff;
+  .el-select {
+    width: 100%;
   }
+  .el-date-editor {
+    width: 100%;
+  }
+  .el-autocomplete {
+    width: 100%;
+  }
+  .searchArea {
+    margin: 0 10px;
+    padding: 10px 10px 0px;
+    display: flex;
+    justify-content: flex-start;
+    border-bottom: 1px solid #ccc;
+    & > div {
+      display: flex;
+      justify-content: space-between;
+      span {
+        text-align: right;
+        line-height: 42px;
+        min-width: 65px;
+      }
+      .line {
+        text-align: center;
+        line-height: 42px;
+        margin: 0 5px;
+      }
+    }
+  }
+  .btnGuoup {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 10px 10px;
+    padding-bottom: 10px;
+  }
+  .btnGuoup2 {
+    display: flex;
+    justify-content: flex-end;
+    margin: 20px 50px 10px;
+    padding-bottom: 10px;
+  }
+  .tableArea {
+    margin: 10px;
+  }
+  .pageControl {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+  .addGoodsForm {
+    margin-top: -30px;
+    max-height: 630px;
+    overflow-y: scroll;
+    .GoodsTitle {
+      font-size: 16px;
+      margin: 10px 0;
+      .deleteGoodsBtn {
+        cursor: pointer;
+        &:hover {
+          color: #e81123;
+        }
+      }
+    }
+    .oneLine {
+      margin-bottom: 20px;
+      .inputGroup {
+        .inputTitle {
+          text-align: right;
+          padding-right: 15px;
+          line-height: 40px;
+        }
+      }
+    }
+  }
+}
 </style>

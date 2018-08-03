@@ -54,8 +54,21 @@ export default new Router({
         {
           path: 'logisticsed',
           component: _import('pages/logistics/logisticsed')
+        },
+        // 销售退款退货页面
+        {
+          path: 'saleReturn',
+          component: _import('pages/saleReturn/saleReturn')
+        },
+        {
+          path: 'returnHandle',
+          component: _import('pages/saleReturn/returnHandle')
+        },
+        // 供应商退货单页面
+        {
+          path: 'sellerPayment',
+          component: _import('pages/sellerPayment/sellerPayment')
         }
-
       ]
       
     }

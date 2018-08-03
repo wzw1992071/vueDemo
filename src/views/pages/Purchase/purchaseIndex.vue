@@ -7,7 +7,6 @@
        <!-- 线上版本 -->
       <form  id="searchForm" :action="formAction" method="get" target="_blank">
         <div class="searchArea">
-          
           <div>
             <div class="block">
               <el-date-picker
