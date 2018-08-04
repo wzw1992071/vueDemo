@@ -167,7 +167,7 @@ export default {
         this.$axios
         .get("/provider/goods-back/list", { params: sendParam })
         .then(r => {
-          console.log(r.data)
+
           this.dataTotal = r.data.data.goods.total;
           this.searchParam.page = r.data.data.goods.page
             ? r.data.data.goods.page
@@ -182,11 +182,26 @@ export default {
           console.log(`获取数据失败！+${err}`);
         });
       },
-      returnHandle(){
+      returnHandle(item,type){
+        this.$axios
+          .post("/provider/proceeds", {
 
+          }).then(r=>{
+            this.$message({
+              message: "操作成功！",
+              type: "success"
+            });
+          }).catch(err => {
+            this.$message.error({
+              message: "操作失败！"
+            });
+            console.log(`获取数据失败！+${err}`);
+          });
+        
       },
-      pageChange(){
-
+      pageChange(page){    
+        this.searchParam.page = page;
+        this.search();
       }
   },
   created() {

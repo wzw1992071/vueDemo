@@ -132,9 +132,9 @@ export default {
                 },
                  { 
                     index:"6",  
-                    name:"供应商退货",
+                    name:"供应商付款",
                     childs:[
-                        {index:"6-1",  name:"供应商退货" ,path:"/sellerPayment"}
+                        {index:"6-1",  name:"供应商付款" ,path:"/sellerPayment"}
                     ]
                 }
                 // ,{ 
