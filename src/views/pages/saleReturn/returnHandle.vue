@@ -173,7 +173,9 @@ export default {
             ? r.data.data.goods.page
             : this.searchParam.page;
           this.tableData = r.data.data.goods.goods;
-          
+          this.tableData.forEach((item,index)=>{
+            item.statusName=this.codaText[item.status]
+          })
         })
         .catch(err => {
           this.$message.error({
@@ -182,15 +184,19 @@ export default {
           console.log(`获取数据失败！+${err}`);
         });
       },
+      // 退货订单处理
       returnHandle(item,type){
+        // console.log(item)
         this.$axios
-          .post("/provider/proceeds", {
-
+          .post("/provider/goods-back/deal-with", {
+            type:type,
+            goods_numbers:[item.goods_number]
           }).then(r=>{
             this.$message({
               message: "操作成功！",
               type: "success"
             });
+            this.search();
           }).catch(err => {
             this.$message.error({
               message: "操作失败！"

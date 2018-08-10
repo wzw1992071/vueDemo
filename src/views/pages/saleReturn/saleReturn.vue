@@ -70,7 +70,6 @@
               </div>
           </div>
         </div>
-        <p style="color:#f00;"> 温馨提示：按住shift，可以用滚轮操作横向滚动条</p>
         <!-- 表单 -->
         <div class="tableArea">
            <el-table
@@ -274,7 +273,7 @@ export default {
       },
       // 下拉框选项
       selectData: {
-        proceeds_status: [{ id: 1, name: "未收货" }, { id: 2, name: "已收货" }]
+        proceeds_status: [{ id: 1, name: "未收款" }, { id: 2, name: "已收款" }]
       },
       // 表格数据
       tableData: [],
@@ -375,18 +374,34 @@ export default {
       let sendParam = [];
       if (items.length) {
         items.forEach((item, index) => {
-          sendParam.push({
-            order_no: item.order_no,
-            proceeds_amount: item.receivable_amount * 100,
-            remark: item.remark
-          });
+          if(item.remark){
+            sendParam.push({
+              order_no: item.order_no,
+              proceeds_amount: item.receivable_amount * 100,
+              remark: item.remark
+            });
+          }else{
+            sendParam.push({
+              order_no: item.order_no,
+              proceeds_amount: item.receivable_amount * 100,
+            });
+          }
+          
         });
       } else {
-        sendParam.push({
-          order_no: items.order_no,
-          proceeds_amount: items.receivable_amount * 100,
-          remark: items.remark
-        });
+        if(items.remark){
+          sendParam.push({
+            order_no: items.order_no,
+            proceeds_amount: items.receivable_amount * 100,
+            remark: items.remark
+          });
+        }else{
+          sendParam.push({
+            order_no: items.order_no,
+            proceeds_amount: items.receivable_amount * 100,
+          });
+        }
+        
       }
       this.$confirm("确认收款后将不可更改，是否确认收款？", "确认收款", {
         confirmButtonText: "确定",

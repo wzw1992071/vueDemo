@@ -27,14 +27,18 @@
             </div>
           </div>
           <div class="demo-input-suffix">
-            <span>客户：</span>  
+            <span>供应商：</span>  
             <el-input v-model="searchParam.seller" name="seller"></el-input>
+          </div>
+          <div class="demo-input-suffix">
+            <span>客户名：</span>  
+            <el-input v-model="searchParam.buyer" name="buyer"></el-input>
           </div>
           <div class="demo-input-suffix">
             <span>商品名：</span> 
              <el-select
               v-model="searchParam.goods_name"
-              style="width: 350px;"
+              style="width: 280px;"
               filterable
               @visible-change="getShopList"
               multiple
@@ -71,6 +75,17 @@
                 :value="item.id">
               </el-option>
             </el-select>
+            <div class="selecDiv">
+            <span>采购方式：</span>
+            <el-select class="" v-model="searchParam.purchases_mode" name="status" clearable  placeholder="请选择">
+              <el-option
+                v-for="item in selectData.purchases_mode"
+                :key="item.value"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </div>
           </div>
           <div class="btnGuoup">
             <el-button type="success" icon="el-icon-search" @click="search">确认</el-button>
@@ -82,7 +97,6 @@
         <!-- 搜索按钮 -->
      
       </form>
-      <p style="color:#f00;"> 温馨提示：按住shift，可以用滚轮操作横向滚动条</p>
        <!-- 表单 -->
       <div class="tableArea">
         <el-table
@@ -270,12 +284,12 @@
           </el-row>  
           <el-row class="oneLine">
             <el-col :span="12"><div class="grid-content inputGroup">
-                <el-col :span="6"><div class="inputTitle">供应商电话：</div></el-col>
-                <el-col :span="18"><el-input v-model="changeData.seller_tel"></el-input></el-col>
-            </div></el-col>
-            <el-col :span="12"><div class="grid-content inputGroup">
                 <el-col :span="6"><div class="inputTitle">供应商名称：</div></el-col>
                 <el-col :span="18"><el-input v-model="changeData.seller_shop"></el-input></el-col>
+            </div></el-col>
+             <el-col :span="12"><div class="grid-content inputGroup">
+                <el-col :span="6"><div class="inputTitle">供应商电话：</div></el-col>
+                <el-col :span="18"><el-input v-model="changeData.seller_tel"></el-input></el-col>
             </div></el-col>
           </el-row>  
           <el-row class="oneLine">
@@ -347,11 +361,13 @@ export default {
         start_date:new Date(),//开始时间
         end_date:new Date(),//结束时间
         seller:'',//客户供应商
+        buyer:'',//买家
         goods_name:[],//商品名
         page:1,//当前页
         size:50,//每页数量
         reach_status:'',//到货状态
-        status:[]//采购状态
+        status:[],//采购状态
+        purchases_mode:""//采购方式
       },
       // 获取商品的时间
       getGoodsTime:{
@@ -675,6 +691,9 @@ export default {
       display: flex;
       height: 50px !important;
       justify-content: flex-start;
+      .el-date-editor.el-input {
+        width: 160px;
+      }
       &>div{
 
         display: flex;

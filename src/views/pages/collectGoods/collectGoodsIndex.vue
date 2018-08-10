@@ -50,7 +50,7 @@
       </div>
      
     
-     <p style="color:#f00;"> 温馨提示：按住shift，可以用滚轮操作横向滚动条</p>
+
       <!-- 表单 -->
       <div class="tableArea">
         <el-table

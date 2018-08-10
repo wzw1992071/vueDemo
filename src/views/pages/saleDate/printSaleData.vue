@@ -43,8 +43,7 @@
       </div>
       </form>
       <!-- 搜索按钮 -->
-     
-      <p style="color:#f00;"> 温馨提示：按住shift，可以用滚轮操作横向滚动条</p>
+
       <!-- 表单 -->
       <div class="tableArea">
         <el-table
@@ -384,9 +383,9 @@ export default {
             }
             tableMain += "</table>";
             var tableHeight =
-              printData[j].order.goods.length < 9
+              printData[j].order.goods.length < 5
                 ? 267
-                : 66 * (printData[j].order.goods.length + 1);
+                : 72 * (printData[j].order.goods.length);
             LODOP.ADD_PRINT_TABLE(nowHeight, 30, 550, tableHeight, tableMain);
 
             LODOP.ADD_PRINT_TEXT(

@@ -30,7 +30,6 @@
             <el-button type="primary" icon="el-icon-tickets" @click="addOrder">添加订单</el-button>
         </div>
       </div>
-      <p style="color:#f00;"> 温馨提示：按住shift，可以用滚轮操作横向滚动条</p>
       <!-- 表单 -->
       <div class="tableArea">
         <el-table
@@ -987,7 +986,7 @@ export default {
       this.addOrderInfo.goods[this.changeRowIndex].seller_address =
         value.seller_address;
       this.addOrderInfo.goods[this.changeRowIndex].original_price =
-        value.original_price / 100;
+        value.original_price;
     },
     // 得到当前行
     getRow(i) {
