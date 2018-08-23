@@ -16,11 +16,12 @@ export default new Router({
         // 订单首页路由
         {
           path: 'orderList',
-          alias:'/', //重命名，让进来加载默认为orderList
+          
           component: _import('pages/orderIndex/orderList')
         },
         {
           path: 'otherImport',
+          alias:'/', //重命名，让进来加载默认为orderList
           component: _import('pages/orderIndex/otherImport')
         },
         {

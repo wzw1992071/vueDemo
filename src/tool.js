@@ -49,8 +49,17 @@
         }else{
             console.log("请传入时间")
         }
-    }
+    };
     // 数组原型拓展方法
+    // 匹配规则
+    $tools.createFilter=function(queryString, type) {
+        return restaurant => {
+            return (
+            restaurant[type].toLowerCase().indexOf(queryString.toLowerCase()) ===
+            0
+            );
+        };
+    }
     Array.prototype.delete = function(dx) { 
         if(isNaN(dx)||dx>this.length){return false;} 
         this.splice(dx,1); 

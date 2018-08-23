@@ -13,6 +13,7 @@
               v-model="searchParam.start_date"
               type="date"
               name="start_date"
+               @change="getDataTips"
               placeholder="开始日期">
             </el-date-picker>
           </div>
@@ -22,14 +23,24 @@
               name= "end_date"
               v-model="searchParam.end_date"
               type="date"
+               @change="getDataTips"
               placeholder="结束日期">
             </el-date-picker>
           </div>
         </div>
         <div class="demo-input-suffix">
+            <span>采购商：</span>  
+             <el-autocomplete 
+              v-model="searchParam.buyer"
+              :fetch-suggestions="queryBuyerName"
+              :trigger-on-focus="false"
+              >
+            </el-autocomplete>
+          </div>
+        <!-- <div class="demo-input-suffix">
           <span>店铺名：</span>  
           <el-input v-model="searchParam.buyer" name="buyer"></el-input>
-        </div>
+        </div> -->
         <!-- <div class="demo-input-suffix">
           <span>商品名：</span>  
           <el-input v-model="searchParam.goods_name"></el-input>
@@ -59,12 +70,7 @@
             type="selection"
             width="55">
           </el-table-column>
-          <el-table-column
-            type="index"
-            label="序号"
-            align="center"
-            width="80">
-          </el-table-column>
+      
           <el-table-column
             prop="order_no"
             label="订单号"
@@ -132,7 +138,7 @@
                 width="1200"
                 trigger="click">
                 <el-table :data="goodsInfo" border max-height="500">
-                  <el-table-column label="序号" type="index" align="center" width="50"></el-table-column>
+                  
                   <el-table-column min-width="150" align="center" property="goods_name" label="品名"></el-table-column>
                   <el-table-column min-width="100" align="center" property="goods_sell_price" label="单价（元）" :formatter="formatter"></el-table-column>
                   <el-table-column min-width="100" align="center" property="acceptance_num" label="数量"></el-table-column>
@@ -176,6 +182,10 @@ export default {
         goods_name: "", //商品名称
         page: 1, //当前页
         size: 50 //每页数量
+      },
+      // 输入提示内容
+      tips:{
+        buyerTips:[],
       },
       // 下拉框属性
       selectOptions: {},
@@ -233,6 +243,56 @@ export default {
     pageChange(page) {
       this.searchParam.page = page;
       this.search();
+    },
+     // 获取搜索栏数据提示
+    getDataTips() {
+      if (this.searchParam.end_date >= this.searchParam.start_date) {
+        let sendParam = {};
+        if (this.searchParam.start_date) {
+          sendParam.start_date = $tools.dateFormat(this.searchParam.start_date);
+        }
+        if (this.searchParam.end_date) {
+          sendParam.end_date = $tools.dateFormat(this.searchParam.end_date);
+        }
+        this.$axios
+          .get("/provider/order/goods/scopescreen/list", {
+            params: sendParam
+          })
+          .then(res => {
+            this.tips.buyerTips=[];
+            this.tips.sellerTips=[];
+            res.data.data.buyers.forEach((item,index)=>{
+              this.tips.buyerTips.push({
+                name:item
+              })
+            })
+          })
+          .catch(err => {
+            console.log(err);
+            this.$message.error({
+              message: "获取提示失败！"
+            });
+          });
+      } else {
+        this.$message.error({
+          message: "请选择正取的时间！"
+        });
+      }
+    },
+    // 买家提示
+    queryBuyerName(queryString, cb){
+      let restaurants = this.tips.buyerTips;
+      let results = queryString
+        ? restaurants.filter($tools.createFilter(queryString, "name"))
+        : restaurants;
+      let a = [];
+      results.forEach(function(item, index) {
+        a.push({
+          value: item.name,
+        
+        });
+      });
+      cb(a);
     },
     // 表单
     // 过滤
@@ -520,6 +580,7 @@ export default {
   },
   created() {
     this.search();
+    this.getDataTips();
   }
 };
 </script>

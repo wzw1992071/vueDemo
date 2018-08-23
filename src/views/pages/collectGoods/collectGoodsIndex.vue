@@ -9,6 +9,7 @@
               <el-date-picker
                 v-model="searchParam.start_date"
                 type="date"
+                @change="getDataTips"
                 placeholder="开始日期">
               </el-date-picker>
             </div>
@@ -17,21 +18,50 @@
               <el-date-picker
                 v-model="searchParam.end_date"
                 type="date"
+                @change="getDataTips"
                 placeholder="结束日期">
               </el-date-picker>
             </div>
           </div>
           <div class="demo-input-suffix">
             <span>供应商：</span>  
-            <el-input v-model="searchParam.seller"></el-input>
+            <!-- <el-input v-model="searchParam.seller" name="seller"></el-input> -->
+            <el-autocomplete 
+              v-model="searchParam.seller"
+              name="seller"
+              :fetch-suggestions="querySellerName"
+              :trigger-on-focus="false"
+              >
+            </el-autocomplete>
           </div>
-          <div class="demo-input-suffix">
+          <!-- <div class="demo-input-suffix">
+            <span>供应商：</span>  
+            <el-input v-model="searchParam.seller"></el-input>
+          </div> -->
+          <!-- <div class="demo-input-suffix">
             <span>商品名：</span>  
             <el-input v-model="searchParam.goods_name"></el-input>
+          </div> -->
+          <div class="demo-input-suffix">
+            <span>商品名：</span> 
+             <el-select
+              v-model="searchParam.goods_name"
+              style="width: 350px;"
+              filterable
+              multiple
+              collapse-tags>
+              <el-option
+                v-for="item in selectData.goods"
+                :key="item.value"
+                :label="item.value"
+                :value="item.value">
+              </el-option>
+            </el-select> 
+            <!-- <el-input v-model="searchParam.goods_name" name="goods_name"></el-input> -->
           </div>
         </div>
         <div class="searchArea">
-          <div class="demo-input-suffix">
+          <!-- <div class="demo-input-suffix">
             <span>采购商：</span>  
              <el-autocomplete 
                 v-model="searchParam.buyer"
@@ -39,6 +69,16 @@
                 :trigger-on-focus="false"
                 >
                 </el-autocomplete>
+          </div> -->
+          <div class="demo-input-suffix">
+            <span>采购商：</span>  
+             <el-autocomplete 
+              v-model="searchParam.buyer"
+              :fetch-suggestions="queryBuyerName"
+              :trigger-on-focus="false"
+              >
+            </el-autocomplete>
+            <!-- <el-input v-model="searchParam.buyer" name="buyer"></el-input> -->
           </div>
             <!-- 搜索按钮 -->
           <div class="btnGuoup">
@@ -66,12 +106,6 @@
             type="selection"
             width="55">
           </el-table-column>
-         <el-table-column
-            label="序号"
-            type="index"
-            align="center"
-            width="50">
-          </el-table-column>
            <el-table-column
             prop="purchases_date"
             label="订单日期"
@@ -81,13 +115,19 @@
           <el-table-column
             prop="seller_shop"
             sortable
-            label="卖家名称"
+            label="供应商名称"
             min-width="120"
             align="center">
           </el-table-column>
           <el-table-column
             prop="seller_tel"
-            label="卖家电话"
+            label="供应商电话"
+            min-width="120"
+            align="center">
+          </el-table-column>
+           <el-table-column
+            prop="buyer_shop_name"
+            label="采购商名称"
             min-width="120"
             align="center">
           </el-table-column>
@@ -146,9 +186,10 @@
             align="center"
             width="100">
               <template slot-scope="scope">
-                <el-button @click="sureGood(scope.row)" type="text" size="small">确认收货</el-button>
+                <!-- <el-button @click="sureGood(scope.row)" type="text" size="small">确认收货</el-button>
                 <el-button @click="editInfo1(scope.row)" type="text" size="small">修改货物品牌</el-button>
-                <el-button @click="editInfo2(scope.row)" type="text" size="small">修改收货数量</el-button>
+                <el-button @click="editInfo2(scope.row)" type="text" size="small">修改收货数量</el-button> -->
+                <el-button @click="editInfo1(scope.row)" type="text" size="small">修改货物状态</el-button>
               </template>
           </el-table-column>
         </el-table>
@@ -164,12 +205,18 @@
       </div>
 
        <!-- 修改品牌弹出框 -->
-      <el-dialog title="修改品牌" :visible.sync="dialogFormVisible1" width="40%">
+      <el-dialog title="修改状态" :visible.sync="dialogFormVisible1" width="40%" :close-on-click-modal=false>
         <div>
           <el-row class="oneLine">
             <el-col :span="20"><div class="grid-content inputGroup">
                 <el-col :span="6"><div class="inputTitle">品牌名称：</div></el-col>
                 <el-col :span="18"><el-input v-model="changeData.brand"></el-input></el-col>
+            </div></el-col>
+          </el-row>   
+          <el-row class="oneLine">
+            <el-col :span="20"><div class="grid-content inputGroup">
+                <el-col :span="6"><div class="inputTitle">收货数量：</div></el-col>
+                <el-col :span="18"><el-input v-model.number="changeData.acceptance_num" type="number"></el-input></el-col>
             </div></el-col>
           </el-row>   
         </div>
@@ -179,7 +226,7 @@
         </div>
       </el-dialog>
        <!-- 修改收货数量弹出框 -->
-      <el-dialog title="收货数量" :visible.sync="dialogFormVisible2" width="40%">
+      <!-- <el-dialog title="收货数量" :visible.sync="dialogFormVisible2" width="40%">
         <div>
           <el-row class="oneLine">
             <el-col :span="20"><div class="grid-content inputGroup">
@@ -192,7 +239,7 @@
           <el-button type="primary" @click="submitInfo2">确 定</el-button>
           <el-button @click="dialogFormVisible2 = false">取 消</el-button> 
         </div>
-      </el-dialog>
+      </el-dialog> -->
 
     
         <!-- <div class="pdfbox" id="pdfbox">
@@ -222,6 +269,11 @@ export default {
         size:'50',//每页数量
         
       },
+      // 输入提示内容
+      tips:{
+        sellerTips:[],
+        buyerTips:[],
+      },
       // 输入框数据提示
       AllBuyerInfo:[],
       // 表格数据
@@ -231,7 +283,8 @@ export default {
       // 复选框中的项
       multipleSelection: [],
       selectData:{
-        status:[]
+        status:[],
+        goods:[]
       },
       // 控制修改品牌弹窗显示
       dialogFormVisible1:false,
@@ -259,26 +312,83 @@ export default {
         that.search()
       })
     },
-    // 搜索提示
-    querySearchbuyer(queryString, cb){
-      let restaurants = this.AllBuyerInfo;
-      let results = queryString ? restaurants.filter(this.createFilter(queryString,"shop_name")) : restaurants;
-      let a = []
-      results.forEach(function(item,index){
-        a.push({
-          value:item.shop_name,
-          // tel:item.mobile_phone,
-          // addresses:item.addresses
-        })
-      })
-      cb(a);
-    },
-    // 匹配规则
-    createFilter(queryString,type) {
-      return (restaurant) => {
-        return (restaurant[type].toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+   // 获取搜索栏数据提示
+    getDataTips() {
+      if (this.searchParam.end_date >= this.searchParam.start_date) {
+        let sendParam = {};
+        if (this.searchParam.start_date) {
+          sendParam.start_date = $tools.dateFormat(this.searchParam.start_date);
+        }
+        if (this.searchParam.end_date) {
+          sendParam.end_date = $tools.dateFormat(this.searchParam.end_date);
+        }
+        this.$axios
+          .get("/provider/order/goods/scopescreen/list", {
+            params: sendParam
+          })
+          .then(res => {
+            this.tips.buyerTips=[];
+            this.tips.sellerTips=[];
+            this.selectData.goods=[]
+            res.data.data.buyers.forEach((item,index)=>{
+              this.tips.buyerTips.push({
+                name:item
+              })
+            })
+            res.data.data.sellers.forEach((item,index)=>{
+              this.tips.sellerTips.push({
+                name:item
+              })
+            })
+            res.data.data.goods.forEach((item,index)=>{
+              this.selectData.goods.push({
+                value:item
+              })
+            })
+          })
+          .catch(err => {
+            console.log(err);
+            this.$message.error({
+              message: "获取提示失败！"
+            });
+          });
+      } else {
+        this.$message.error({
+          message: "请选择正取的时间！"
+        });
       }
     },
+    // 卖家提示
+    querySellerName(queryString, cb){
+      let restaurants = this.tips.sellerTips;
+      let results = queryString
+        ? restaurants.filter($tools.createFilter(queryString, "name"))
+        : restaurants;
+      let a = [];
+      results.forEach(function(item, index) {
+        a.push({
+          value: item.name,
+        
+        });
+      });
+      cb(a);
+    },
+    // 买家提示
+    queryBuyerName(queryString, cb){
+      let restaurants = this.tips.buyerTips;
+      let results = queryString
+        ? restaurants.filter($tools.createFilter(queryString, "name"))
+        : restaurants;
+      let a = [];
+      results.forEach(function(item, index) {
+        a.push({
+          value: item.name,
+        
+        });
+      });
+      cb(a);
+    },
+  
     // 请求页面数据
     search(){
       var that= this
@@ -371,29 +481,29 @@ export default {
         });
       })
     },
-    printPDF(){
 
-    },
     // 弹出修改品牌
     editInfo1(data){
       this.changeData.id = data.id;
-      this.changeData.brand="";
+      this.changeData.brand=data.new_brand;
+      this.changeData.acceptance_num=data.purchases_num
       this.dialogFormVisible1=true;
     },
-    // 弹出修改收货数量
-    editInfo2(data){
-      this.changeData.id = data.id;
-      this.changeData.acceptance_num=data.purchases_num
-      this.dialogFormVisible2=true;
-    },
-    // 修改品牌
+    // // 弹出修改收货数量
+    // editInfo2(data){
+    //   this.changeData.id = data.id;
+    //   this.changeData.acceptance_num=data.purchases_num
+    //   this.dialogFormVisible2=true;
+    // },
+    // 修改品牌和收货数量
     submitInfo1(){
       var that = this;
-      if(that.changeData.brand){
-        this.$axios.post("/provider/purchases/brand/update",{
+      if(that.changeData.brand&&that.changeData.acceptance_num>=0){
+        this.$axios.post("/provider/purchases/goods/confirm",{
           id:that.changeData.id,
-          brand:that.changeData.brand
-        }).then(function(){
+          brand:that.changeData.brand,
+          acceptance_num:that.changeData.acceptance_num,
+        }).then(res=>{
           that.$message({
             message: '修改成功！',
             type: 'success'
@@ -408,7 +518,7 @@ export default {
         })
       }else{
         this.$message({
-          message: '请确认已经输入品牌名称',
+          message: '请完善数据！',
           type: 'warning'
         });
       }
@@ -515,6 +625,7 @@ export default {
   
   created(){
     let that = this;
+    this.getDataTips();
     that.$axios.get("/custom/lists/all").then( (r)=>{
       this.AllBuyerInfo = r.data.data
       this.getNormalData();
@@ -540,6 +651,7 @@ export default {
         padding: 5px 0;
         display: flex;
         justify-content: flex-start;
+        
         &>div{
           margin-left: 10px;
           display: flex;
@@ -554,6 +666,7 @@ export default {
             line-height: 42px;
             margin: 0 5px; 
           }
+          
         }
       }
     }

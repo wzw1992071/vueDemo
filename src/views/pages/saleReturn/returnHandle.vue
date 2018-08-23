@@ -9,6 +9,7 @@
                     <el-date-picker
                         v-model="searchParam.back_date"
                         type="date"
+                        @change="getDataTips"
                         placeholder="请选择日期">
                     </el-date-picker>
                     </div>
@@ -23,12 +24,32 @@
                 </div>
             </div>
             <div class="demo-input-suffix">
-                <span>商品名</span>  
-                <el-input v-model="searchParam.goods_name" ></el-input>
+              <span>商品名：</span> 
+              <el-select
+                v-model="searchParam.goods_name"
+                style="width: 350px;"
+                filterable
+                multiple
+                collapse-tags>
+                <el-option
+                  v-for="item in selectData.goods"
+                  :key="item.value"
+                  :label="item.value"
+                  :value="item.value">
+                </el-option>
+              </el-select> 
+              <!-- <el-input v-model="searchParam.goods_name" name="goods_name"></el-input> -->
             </div>
-             <div class="demo-input-suffix">
-                <span>供应商：</span>  
-                <el-input v-model="searchParam.seller" ></el-input>
+            <div class="demo-input-suffix">
+              <span>供应商：</span>  
+              <!-- <el-input v-model="searchParam.seller" name="seller"></el-input> -->
+              <el-autocomplete 
+                v-model="searchParam.seller"
+                name="seller"
+                :fetch-suggestions="querySellerName"
+                :trigger-on-focus="false"
+                >
+              </el-autocomplete>
             </div>
             <div class="btnGuoup">
                   <el-button type="success" icon="el-icon-search" @click="search">确认</el-button>
@@ -43,12 +64,7 @@
             border
             align="center"
             >
-              <el-table-column
-                label="序号"
-                type="index"
-                align="center"
-                width="50">
-              </el-table-column>
+            
               <el-table-column
                 prop="created_at"
                 label="退货日期"
@@ -134,9 +150,14 @@ export default {
         goods_name: "", //商品名
         seller: "" //供应商
       },
+      // 输入提示内容
+      tips:{
+        sellerTips:[],
+      },
       // 下拉框选项
       selectData: {
-        proceeds_status: [{ id: 1, name: "未收货" }, { id: 2, name: "已收货" }]
+        proceeds_status: [{ id: 1, name: "未收货" }, { id: 2, name: "已收货" }],
+         goods:[]
       },
       // 表格数据
       tableData: [],
@@ -184,6 +205,58 @@ export default {
           console.log(`获取数据失败！+${err}`);
         });
       },
+       // 获取搜索栏数据提示
+      getDataTips() {
+       
+          let sendParam = {};
+          if (this.searchParam.back_date) {
+            sendParam.date = $tools.dateFormat(this.searchParam.back_date);
+          }
+         
+          this.$axios
+            .get("/provider/scope/goods-back/list", {
+              params: sendParam
+            })
+            .then(res => {
+
+              this.tips.sellerTips=[];
+              this.selectData.goods=[]
+
+              res.data.data.sellers.forEach((item,index)=>{
+                this.tips.sellerTips.push({
+                  name:item
+                })
+              })
+              res.data.data.goods.forEach((item,index)=>{
+                this.selectData.goods.push({
+                  value:item
+                })
+              })
+            })
+            .catch(err => {
+              console.log(err);
+              this.$message.error({
+                message: "获取提示失败！"
+              });
+            });
+      
+      },
+      // 卖家提示
+      querySellerName(queryString, cb){
+        let restaurants = this.tips.sellerTips;
+        let results = queryString
+          ? restaurants.filter($tools.createFilter(queryString, "name"))
+          : restaurants;
+        let a = [];
+        results.forEach(function(item, index) {
+          a.push({
+            value: item.name,
+          
+          });
+        });
+        cb(a);
+      },
+
       // 退货订单处理
       returnHandle(item,type){
         // console.log(item)
@@ -211,6 +284,7 @@ export default {
       }
   },
   created() {
+    this.getDataTips();
     this.search();
   }
 };

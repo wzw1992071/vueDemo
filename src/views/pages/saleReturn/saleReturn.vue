@@ -10,6 +10,7 @@
                     <el-date-picker
                         v-model="searchParam.order_start_date"
                         type="date"
+                        @change="getDataTips"
                         placeholder="订单开始日期">
                     </el-date-picker>
                     </div>
@@ -18,14 +19,25 @@
                     <el-date-picker
                         v-model="searchParam.order_end_date"
                         type="date"
+                        @change="getDataTips"
                         placeholder="订单结束日期">
                     </el-date-picker>
                     </div>
                 </div>
               </div>
-              <div class="demo-input-suffix">
+              <!-- <div class="demo-input-suffix">
                   <span>客户名：</span>  
                   <el-input v-model="searchParam.buyer" ></el-input>
+              </div> -->
+              <div class="demo-input-suffix">
+                <span>客户名：</span>  
+                <el-autocomplete 
+                  v-model="searchParam.buyer"
+                  :fetch-suggestions="queryBuyerName"
+                  :trigger-on-focus="false"
+                  >
+                </el-autocomplete>
+
               </div>
               <div class="demo-input-suffix">
                   <span>订单号：</span>  
@@ -81,13 +93,7 @@
             ref="multipleTable"
             @selection-change="handleSelectionChange"
             >
-              <el-table-column
-                fixed
-                label="序号"
-                type="index"
-                align="center"
-                min-width="40">
-              </el-table-column>
+              
               <el-table-column
                 fixed
                 type="selection"
@@ -196,12 +202,7 @@
                     max-height="800"
                     border
                     align="center">
-                  <el-table-column
-                    label="序号"
-                    type="index"
-                    align="center"
-                    width="50">
-                  </el-table-column>
+                  
                   <el-table-column
                     prop="goods_number"
                     label="商品编号"
@@ -274,6 +275,10 @@ export default {
       // 下拉框选项
       selectData: {
         proceeds_status: [{ id: 1, name: "未收款" }, { id: 2, name: "已收款" }]
+      },
+      // 输入提示内容
+      tips:{
+        buyerTips:[],
       },
       // 表格数据
       tableData: [],
@@ -348,6 +353,56 @@ export default {
     pageChange(page) {
       this.searchParam.page = page;
       this.search();
+    },
+       // 获取搜索栏数据提示
+    getDataTips() {
+      if (this.searchParam.order_end_date >= this.searchParam.order_start_date) {
+        let sendParam = {};
+        if (this.searchParam.order_start_date) {
+          sendParam.start_date = $tools.dateFormat(this.searchParam.order_start_date);
+        }
+        if (this.searchParam.order_end_date) {
+          sendParam.end_date = $tools.dateFormat(this.searchParam.order_end_date);
+        }
+        this.$axios
+          .get("/provider/order/goods/scopescreen/list", {
+            params: sendParam
+          })
+          .then(res => {
+            this.tips.buyerTips=[];
+            this.tips.sellerTips=[];
+            res.data.data.buyers.forEach((item,index)=>{
+              this.tips.buyerTips.push({
+                name:item
+              })
+            })
+          })
+          .catch(err => {
+            console.log(err);
+            this.$message.error({
+              message: "获取提示失败！"
+            });
+          });
+      } else {
+        this.$message.error({
+          message: "请选择正取的时间！"
+        });
+      }
+    },
+    // 买家提示
+    queryBuyerName(queryString, cb){
+      let restaurants = this.tips.buyerTips;
+      let results = queryString
+        ? restaurants.filter($tools.createFilter(queryString, "name"))
+        : restaurants;
+      let a = [];
+      results.forEach(function(item, index) {
+        a.push({
+          value: item.name,
+        
+        });
+      });
+      cb(a);
     },
     // 全选功能
     handleSelectionChange(val) {
@@ -519,6 +574,7 @@ export default {
   },
   created() {
     this.search();
+    this.getDataTips();
   }
 };
 </script>

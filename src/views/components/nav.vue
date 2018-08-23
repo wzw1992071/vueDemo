@@ -94,8 +94,9 @@ export default {
                     index:"1",  
                     name:"订单首页",
                     childs:[
-                        {index:"1-1",  name:"订单列表" ,path:"/orderList"},
-                        {index:"1-2",  name:"冻参谋导入",path:"/otherImport"},
+                      {index:"1-1",  name:"冻参谋导入",path:"/otherImport"},
+                      {index:"1-2",  name:"订单列表" ,path:"/orderList"},
+                        
                         // {index:"1-3",  name:"手动加单",path:"/orderHandAdd"},
                         // {index:"1-4",  name:"订单导出",path:"/orderExport"},
                     ]
@@ -150,7 +151,7 @@ export default {
   computed:{
     //   根据路由得到默认选中项
       defaultCheck(){
-          let i =this.$route.path=="/"?"/orderList":this.$route.path
+          let i =this.$route.path=="/"?"/otherImport":this.$route.path
           return i
       }
   },

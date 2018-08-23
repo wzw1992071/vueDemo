@@ -22,7 +22,13 @@
         </div>
         <div class="demo-input-suffix">
           <span>客户：</span>  
-          <el-input v-model="searchParam.buyer"></el-input>
+          <!-- <el-input v-model="searchParam.buyer"></el-input> -->
+          <el-autocomplete 
+            v-model="searchParam.buyer"
+            :fetch-suggestions="querySearchName"
+            :trigger-on-focus="false"
+            >
+          </el-autocomplete>
         </div>
          <!-- 搜索按钮 -->
         <div class="btnGuoup">
@@ -39,12 +45,7 @@
           border
           align="center"
           >
-          <el-table-column
-            label="序号"
-            type="index"
-            align="center"
-           min-width="50">
-          </el-table-column>
+        
           <el-table-column
             prop="order_no"
             label="订单号"
@@ -111,7 +112,7 @@
                 width="1200"
                 trigger="click">
                 <el-table :data="goodsInfo" border max-height="500">
-                  <el-table-column label="序号" type="index" align="center" width="50"></el-table-column>
+                 
                   <el-table-column min-width="150" align="center" property="goods_name" label="品名"></el-table-column>
                   <el-table-column min-width="100" align="center" property="goods_sell_price" label="单价" :formatter="formatter"></el-table-column>
                   <el-table-column min-width="100" align="center" property="buy_num" label="数量"></el-table-column>
@@ -146,12 +147,7 @@
                   max-height="800"
                   border
                   align="center">
-                <el-table-column
-                  label="序号"
-                  type="index"
-                  align="center"
-                  width="50">
-                </el-table-column>
+               
                 <el-table-column
                   prop="goods_name"
                   label="商品名称"
@@ -365,12 +361,7 @@
                   max-height="800"
                   border
                   align="center">
-                <el-table-column
-                  label="序号"
-                  type="index"
-                  align="center"
-                  width="50">
-                </el-table-column>
+               
                 <el-table-column
                   prop="goods_name"
                   label="商品名称"

@@ -50,6 +50,7 @@ axios.interceptors.response.use(function(res){
         message:"请求失败"
     })
     console.log(`请求失败:${res.data.message}`)
+    return Promise.reject(error);
   }
 
   return res;

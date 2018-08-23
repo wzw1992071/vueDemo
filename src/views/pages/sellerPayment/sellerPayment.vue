@@ -9,6 +9,7 @@
                     <el-date-picker
                         v-model="searchParam.purchase_start_date"
                         type="date"
+                        @change="getDataTips"
                         placeholder="订单开始日期">
                     </el-date-picker>
                     </div>
@@ -17,6 +18,7 @@
                     <el-date-picker
                         v-model="searchParam.purchase_end_date"
                         type="date"
+                        @change="getDataTips"
                         placeholder="订单结束日期">
                     </el-date-picker>
                     </div>
@@ -24,13 +26,37 @@
             </div>
             
             <div class="demo-input-suffix">
-                <span>供应商：</span>  
-                <el-input v-model="searchParam.seller"></el-input>
+              <span>供应商：</span>  
+              <!-- <el-input v-model="searchParam.seller" name="seller"></el-input> -->
+              <el-autocomplete 
+                v-model="searchParam.seller"
+                name="seller"
+                :fetch-suggestions="querySellerName"
+                :trigger-on-focus="false"
+                >
+              </el-autocomplete>
             </div>
-             <div class="demo-input-suffix">
+             <!-- <div class="demo-input-suffix">
                 <span>商品名：</span>  
                 <el-input v-model="searchParam.goods_name" ></el-input>
-            </div>
+            </div> -->
+            <div class="demo-input-suffix">
+            <span>商品名：</span> 
+             <el-select
+              v-model="searchParam.goods_name"
+              style="width: 350px;"
+              filterable
+              multiple
+              collapse-tags>
+              <el-option
+                v-for="(item,index) in selectData.goods"
+                :key="index"
+                :label="item.value"
+                :value="item.value">
+              </el-option>
+            </el-select> 
+           
+          </div>
             <div class="selecDiv">
                 <span>收款状态：</span>
                 <el-select class="" v-model="searchParam.status"  clearable  placeholder="请选择">
@@ -90,13 +116,7 @@
             align="center"
             ref="multipleTable"
             @selection-change="handleSelectionChange">
-              <el-table-column
-                fixed
-                label="序号"
-                type="index"
-                align="center"
-                min-width="40">
-              </el-table-column>
+            
               <el-table-column
                 fixed
                 type="selection"
@@ -220,10 +240,15 @@ export default {
         page: 1, //当前页
         size: 50 //每页数量
       },
+      // 输入提示内容
+      tips: {
+        sellerTips: []
+      },
       // 下拉框选项
       selectData: {
         proceeds_status: [{ id: 1, name: "未收款" }, { id: 2, name: "已收款" }],
-        payPeople: []
+        payPeople: [],
+        goods: []
       },
       // 表格数据
       tableData: [],
@@ -236,20 +261,23 @@ export default {
   methods: {
     // 获取下拉框数据
     getSelectData() {
-      this.$axios.get("/provider/buyers/list").then((r)=>{
-        // console.log(r.data.data.list)
-        r.data.data.lists.forEach(item=>{
-          this.selectData.payPeople.push({
-            id: item.payer, 
-            name:item.payer
-          })
+      this.$axios
+        .get("/provider/buyers/list")
+        .then(r => {
+          // console.log(r.data.data.list)
+          r.data.data.lists.forEach(item => {
+            this.selectData.payPeople.push({
+              id: item.payer,
+              name: item.payer
+            });
+          });
         })
-      }).catch((err=>{
-        this.$message.error({
+        .catch(err => {
+          this.$message.error({
             message: "获取付款人失败！"
           });
           console.log(`获取付款人失败！+${err}`);
-      }));
+        });
     },
     // 全选功能
     handleSelectionChange(val) {
@@ -257,14 +285,77 @@ export default {
     },
     // 表格多选禁用
     selectable(row) {
-      return row.status==1?true:false;
+      return row.status == 1 ? true : false;
+    },
+    // 获取搜索栏数据提示
+    getDataTips() {
+      if (
+        this.searchParam.purchase_end_date >=
+        this.searchParam.purchase_start_date
+      ) {
+        let sendParam = {};
+        if (this.searchParam.purchase_start_date) {
+          sendParam.start_date = $tools.dateFormat(
+            this.searchParam.purchase_start_date
+          );
+        }
+        if (this.searchParam.purchase_end_date) {
+          sendParam.end_date = $tools.dateFormat(
+            this.searchParam.purchase_end_date
+          );
+        }
+        this.$axios
+          .get("/provider/order/goods/scopescreen/list", {
+            params: sendParam
+          })
+          .then(res => {
+            this.tips.sellerTips = [];
+            this.selectData.goods=[];
+            res.data.data.sellers.forEach((item, index) => {
+              this.tips.sellerTips.push({
+                name: item
+              });
+            });
+            res.data.data.goods.forEach((item, index) => {
+              this.selectData.goods.push({
+                value: item
+              });
+            });
+          })
+          .catch(err => {
+            console.log(err);
+            this.$message.error({
+              message: "获取提示失败！"
+            });
+          });
+      } else {
+        this.$message.error({
+          message: "请选择正取的时间！"
+        });
+      }
+    },
+    // 卖家提示
+    querySellerName(queryString, cb) {
+      let restaurants = this.tips.sellerTips;
+      let results = queryString
+        ? restaurants.filter($tools.createFilter(queryString, "name"))
+        : restaurants;
+      let a = [];
+      results.forEach(function(item, index) {
+        a.push({
+          value: item.name
+        });
+      });
+      cb(a);
     },
     // 获取数据
     search() {
       let sendParamStr = JSON.stringify(this.searchParam);
       let sendParam = JSON.parse(sendParamStr);
       if (sendParam.purchase_start_date) {
-        sendParam.purchase_start_date = $tools.dateFormat(sendParam.purchase_start_date);
+        sendParam.purchase_start_date = $tools.dateFormat(
+          sendParam.purchase_start_date
+        );
       }
       if (sendParam.purchase_end_date) {
         sendParam.purchase_end_date = $tools.dateFormat(
@@ -299,8 +390,8 @@ export default {
             // item.proceeds_amount = item.proceeds_amount
             //   ? item.proceeds_amount / 100
             //   : item.receivable_amount;
-            if (item.status==1) {
-              item.pay_amount=item.cope_with_amount
+            if (item.status == 1) {
+              item.pay_amount = item.cope_with_amount;
             }
           });
         })
@@ -334,17 +425,17 @@ export default {
       let sendParam = [];
       if (items.length) {
         items.forEach((item, index) => {
-          totalMoney+=item.pay_amount
+          totalMoney += item.pay_amount;
           sendParam.push({
             goods_number: item.goods_number,
-            pay_amount: item.pay_amount * 100,
+            pay_amount: item.pay_amount * 100
           });
         });
       } else {
-        totalMoney+=items.pay_amount
+        totalMoney += items.pay_amount;
         sendParam.push({
           goods_number: items.goods_number,
-          pay_amount: items.pay_amount * 100,
+          pay_amount: items.pay_amount * 100
         });
       }
       // console.log(sendParam)
@@ -377,10 +468,10 @@ export default {
           });
       });
     }
-  
   },
   created() {
-    this.getSelectData()
+    this.getSelectData();
+    this.getDataTips();
     this.search();
   }
 };
@@ -421,7 +512,7 @@ export default {
     span {
       text-align: right;
       line-height: 42px;
-      min-width: 75px;
+      min-width: 82px;
     }
     & > div {
       display: flex;
