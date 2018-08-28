@@ -105,6 +105,7 @@
           <div class="btnGuoup">
             <el-button type="success" icon="el-icon-search" @click="search">确认</el-button>
             <el-button type="primary" icon="el-icon-edit" @click="moreEdit">批量修改</el-button>
+            <el-button type="primary" icon="el-icon-edit" @click="moreCallGoods">批量叫货</el-button>
             <el-button type="primary" icon="el-icon-document" @click="exportMsg">导出</el-button>
             
           </div>
@@ -696,7 +697,18 @@ export default {
         return false;
       }
     },
-
+    // 批量叫货
+    moreCallGoods(){
+      if (this.multipleSelection.length > 0) {
+        
+      } else {
+        this.$message({
+          message: "请选择叫货商品",
+          type: "warning"
+        });
+        return false;
+      }
+    },
     // 导出功能
     exportMsg() {
       if (this.searchParam.start_date && this.searchParam.end_date) {

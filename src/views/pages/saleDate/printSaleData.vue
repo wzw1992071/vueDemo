@@ -29,7 +29,7 @@
           </div>
         </div>
         <div class="demo-input-suffix">
-            <span>采购商：</span>  
+            <span>客户：</span>  
              <el-autocomplete 
               v-model="searchParam.buyer"
               :fetch-suggestions="queryBuyerName"

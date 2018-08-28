@@ -71,7 +71,7 @@
                 </el-autocomplete>
           </div> -->
           <div class="demo-input-suffix">
-            <span>采购商：</span>  
+            <span>客户：</span>  
              <el-autocomplete 
               v-model="searchParam.buyer"
               :fetch-suggestions="queryBuyerName"
@@ -127,7 +127,7 @@
           </el-table-column>
            <el-table-column
             prop="buyer_shop_name"
-            label="采购商名称"
+            label="客户名称"
             min-width="120"
             align="center">
           </el-table-column>
@@ -498,7 +498,7 @@ export default {
     // 修改品牌和收货数量
     submitInfo1(){
       var that = this;
-      if(that.changeData.brand&&that.changeData.acceptance_num>=0){
+      if(that.changeData.acceptance_num>=0){
         this.$axios.post("/provider/purchases/goods/confirm",{
           id:that.changeData.id,
           brand:that.changeData.brand,

@@ -491,6 +491,7 @@ export default {
     returnGoods(item) {
       // this.dialogFormVisible1=true;
       // this.returnData = JSON.parse(JSON.stringify(item))
+      let returnMoney = item.order_amount;
       this.$axios
         .get("/provider/order/goods/list", {
           params: { order_no: item.order_no }
@@ -498,9 +499,10 @@ export default {
         .then(r => {
           if (r.data.message == "OK") {
             this.returnData = r.data.data.goods;
+            console.log(this.returnData)
             this.returnData.forEach((item, index) => {
               item.back_num = 0;
-              item.back_price = 0;
+              item.back_price =returnMoney;
               item.back_amount = 0;
             });
             this.dialogFormVisible1 = true;

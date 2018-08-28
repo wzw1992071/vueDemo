@@ -240,7 +240,7 @@
           <el-form :model="addOrderInfo.order" :rules="rules" label-width="120px" ref="orderForm">
             <el-row>
                 <el-col :span="8">
-                <el-form-item label="采购商铺名:" prop="buyer_shop_name">
+                <el-form-item label="客户铺名:" prop="buyer_shop_name">
                     <el-autocomplete 
                     v-model="addOrderInfo.order.buyer_shop_name"
                     :fetch-suggestions="querySearchName"
@@ -251,7 +251,7 @@
                 </el-form-item>
                 </el-col>
                 <el-col :span="8">
-                <el-form-item label="采购商电话:" prop="buyer_tel">
+                <el-form-item label="客户电话:" prop="buyer_tel">
                     <!-- <el-input v-model="addOrderInfo.order.buyer_tel"></el-input> -->
                     <el-autocomplete 
                     ref="valInput2"
@@ -540,7 +540,7 @@ export default {
           { required: true, message: "店铺名不能为空!", trigger: "blur" }
         ],
         buyer_tel: [
-          { required: true, message: "采购商电话不能为空!", trigger: "blur" },
+          { required: true, message: "客户电话不能为空!", trigger: "blur" },
           { len: 11, message: "请输入正确的电话！", trigger: "blur" }
         ],
         receipt_address: [
