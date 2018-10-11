@@ -618,6 +618,7 @@ export default {
     // 全选功能
     handleSelectionChange(val) {
       this.multipleSelection = val;
+     
     },
     // 编辑功能
     editInfo(data) {
@@ -700,7 +701,27 @@ export default {
     // 批量叫货
     moreCallGoods(){
       if (this.multipleSelection.length > 0) {
-        
+        console.log(this.multipleSelection)
+        let sendParam = {
+          ids: []
+        };
+        for (let i = 0; i < this.multipleSelection.length; i++) {
+          sendParam.ids.push(this.multipleSelection[i].id);
+        }
+         this.$axios
+          .post("/provider/purchases/take-goods/confirm",sendParam).then(res=>{
+            this.$message({
+              message: "修改叫货状态成功！",
+              type: "success"
+            });
+            this.search()
+          }).catch((err)=> {
+            this.$message.error({
+              message: "修改叫货状态失败！"
+            });
+            console.log("err");
+          });
+
       } else {
         this.$message({
           message: "请选择叫货商品",

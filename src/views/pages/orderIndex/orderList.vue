@@ -741,7 +741,7 @@ export default {
       }
     },
     // 省市区3级联动
-    provinceChange() {
+    provinceChange(cb) {
       let that = this;
       // 清空省则清空市区
       that.addOrderInfo.order.city_id = "";
@@ -758,6 +758,9 @@ export default {
                 label: item.name
               });
             });
+            if((typeof cb)=="function"){
+              cb()
+            }
           })
           .catch(function(err) {
             console.log(err);
@@ -768,7 +771,7 @@ export default {
       } else {
       }
     },
-    cityChange() {
+    cityChange(cb) {
       let that = this;
       // 清空市则清空区
       that.addOrderInfo.order.county_id = "";
@@ -783,6 +786,9 @@ export default {
                 label: item.name
               });
             });
+            if((typeof cb)=="function"){
+              cb()
+            }
           })
           .catch(function(err) {
             console.log(err);
@@ -793,7 +799,7 @@ export default {
       } else {
       }
     },
-    countyChange(val) {
+    countyChange() {
       let that = this;
       if (that.addOrderInfo.order.county_id) {
         let a = that.selectOptions.county_id.filter(
@@ -820,6 +826,9 @@ export default {
           value.goods_sell_price = value.goods_sell_price * 100;
           value.original_price = value.original_price * 100;
         });
+        if(!that.addOrderInfo.order.receipt_area){
+          that.addOrderInfo.order.receipt_area=that.addOrderInfo.order.receipt_area_code
+        }
         this.$axios
           .post("/provider/allocation/order/add", that.addOrderInfo)
           .then(function(r) {
@@ -875,13 +884,15 @@ export default {
         a.push({
           value: item.shop_name,
           tel: item.mobile_phone,
-          id: item.id
+          id: item.id,
+          province_id:item.province_id,
+          city_id:item.city_id,
+          county_id:item.county_id
         });
       });
       cb(a);
     },
     handleSelectName(value) {
-      let that = this;
       this.addOrderInfo.order.buyer_tel = value.tel;
       this.$axios
         .get("/custom/address/lists", {
@@ -892,6 +903,14 @@ export default {
             this.shopAddressList = r.data.data;
             this.addOrderInfo.order.receipt_address =
               r.data.data[0].full_address;
+              this.addOrderInfo.order.province_id=value.province_id
+              this.provinceChange(()=>{
+                this.addOrderInfo.order.city_id=value.city_id
+                this.cityChange(()=>{
+                  this.addOrderInfo.order.county_id=value.county_id
+                })
+              })
+            // console.log(value)
           }
         });
     },
@@ -907,7 +926,10 @@ export default {
           value: `${item.shop_name} - ${item.mobile_phone}`,
           shop_name: item.shop_name,
           tel: item.mobile_phone,
-          id: item.id
+          id: item.id,
+          province_id:item.province_id,
+          city_id:item.city_id,
+          county_id:item.county_id
         });
       });
 
@@ -917,7 +939,26 @@ export default {
       this.addOrderInfo.order.buyer_shop_name = value.shop_name;
       this.addOrderInfo.order.buyer_tel = value.tel;
       this.shopAddressList = value.address;
-      this.addOrderInfo.order.receipt_address = value.addresses[0].full_address;
+      this.$axios
+        .get("/custom/address/lists", {
+          params: { id: value.id }
+        })
+        .then(r => {
+          if (r.data.code == 0) {
+            this.shopAddressList = r.data.data;
+            this.addOrderInfo.order.receipt_address =
+              r.data.data[0].full_address;
+              this.addOrderInfo.order.province_id=value.province_id
+              this.provinceChange(()=>{
+                this.addOrderInfo.order.city_id=value.city_id
+                this.cityChange(()=>{
+                  this.addOrderInfo.order.county_id=value.county_id
+                })
+              })
+            // console.log(value)
+          }
+        });
+      // this.addOrderInfo.order.receipt_address = value.addresses[0].full_address;
       this.$refs["valInput2"].$el.querySelectorAll("input")[0].focus();
       this.$refs["valInput2"].$el.querySelectorAll("input")[0].blur();
       // this.$refs["orderForm"].validate()
