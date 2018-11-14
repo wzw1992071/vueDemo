@@ -1,6 +1,7 @@
 // 供应商退货单页面
 <template>
     <div class="mainBox">
+      <form  id="searchForm" :action="formAction" method="get" target="_blank">
         <div class="searchArea">
               <div class="demo-input-suffix">
                 <span>订单日期：</span>  
@@ -9,6 +10,7 @@
                     <el-date-picker
                         v-model="searchParam.purchase_start_date"
                         type="date"
+                        name="purchase_start_date"
                         @change="getDataTips"
                         placeholder="订单开始日期">
                     </el-date-picker>
@@ -18,6 +20,7 @@
                     <el-date-picker
                         v-model="searchParam.purchase_end_date"
                         type="date"
+                        name="purchase_end_date"
                         @change="getDataTips"
                         placeholder="订单结束日期">
                     </el-date-picker>
@@ -32,7 +35,7 @@
                 v-model="searchParam.seller"
                 name="seller"
                 :fetch-suggestions="querySellerName"
-                :trigger-on-focus="false"
+                :trigger-on-focus="true"
                 >
               </el-autocomplete>
             </div>
@@ -45,6 +48,7 @@
              <el-select
               v-model="searchParam.goods_name"
               style="width: 350px;"
+              name="goods_name"
               filterable
               multiple
               collapse-tags>
@@ -59,7 +63,7 @@
           </div>
             <div class="selecDiv">
                 <span>收款状态：</span>
-                <el-select class="" v-model="searchParam.status"  clearable  placeholder="请选择">
+                <el-select class="" v-model="searchParam.status" name="status" clearable  placeholder="请选择">
                   <el-option
                     v-for="item in selectData.proceeds_status"
                     :key="item.id"
@@ -76,6 +80,7 @@
                     <div class="block">
                     <el-date-picker
                         v-model="searchParam.pay_start_date"
+                        name="pay_start_date"
                         type="date"
                         placeholder="订单开始日期">
                     </el-date-picker>
@@ -84,6 +89,7 @@
                     <div class="block">
                     <el-date-picker
                         v-model="searchParam.pay_end_date"
+                        name="pay_end_date"
                         type="date"
                         placeholder="订单结束日期">
                     </el-date-picker>
@@ -92,7 +98,7 @@
             </div>
             <div class="selecDiv">
                 <span>付款人：</span>
-                <el-select class="" v-model="searchParam.payer" clearable  placeholder="请选择">
+                <el-select class="" name="payer" v-model="searchParam.payer" clearable  placeholder="请选择">
                   <el-option
                     v-for="item in selectData.payPeople"
                     :key="item.id"
@@ -104,8 +110,10 @@
             <div class="btnGuoup">
                 <el-button type="success" icon="el-icon-search" @click="search">确认</el-button>
                 <el-button type="primary" icon="el-icon-edit" @click="moreSure">批量确认</el-button>
+                <el-button type="primary" icon="el-icon-document" @click="exportMsg">导出</el-button>
             </div>
         </div>
+      </form>
         <!-- 表单 -->
         <div class="tableArea">
           <el-table
@@ -116,7 +124,6 @@
             align="center"
             ref="multipleTable"
             @selection-change="handleSelectionChange">
-            
               <el-table-column
                 fixed
                 type="selection"
@@ -257,6 +264,17 @@ export default {
       // 复选框中的项
       multipleSelection: []
     };
+  },
+  computed: {
+    formAction() {
+      let url = "";
+      if (window.location.hostname == "localhost") {
+        url = "/api/provider/pay-seller/export";
+      } else {
+        url = "/provider/pay-seller/export";
+      }
+      return url;
+    }
   },
   methods: {
     // 获取下拉框数据
@@ -467,7 +485,19 @@ export default {
             console.log(`确认付款失败！+${err}`);
           });
       });
-    }
+    },
+     // 导出功能
+    exportMsg(){
+      // if (this.searchParam.start_date && this.searchParam.end_date) {
+        this.$el.querySelector("#searchForm").submit();
+      // } else {
+      //   this.$message({
+      //     message: "导出失败！",
+      //     type: "warning"
+      //   });
+      // }
+    },
+
   },
   created() {
     this.getSelectData();

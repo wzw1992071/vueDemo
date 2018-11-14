@@ -26,7 +26,7 @@
           <el-autocomplete 
             v-model="searchParam.buyer"
             :fetch-suggestions="querySearchName"
-            :trigger-on-focus="false"
+            :trigger-on-focus="true"
             >
           </el-autocomplete>
         </div>
@@ -245,7 +245,7 @@
                     v-model="addOrderInfo.order.buyer_shop_name"
                     :fetch-suggestions="querySearchName"
                     @select="handleSelectName"
-                    :trigger-on-focus="false"
+                    :trigger-on-focus="true"
                     >
                     </el-autocomplete>
                 </el-form-item>

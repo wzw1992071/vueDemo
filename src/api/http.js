@@ -61,7 +61,7 @@ axios.interceptors.response.use(function(res){
     Message.error({
         message:"请求失败"
     })
-  return Promise.reject(error);
+  return Promise.reject("请求失败");
 })
 
 export default axios

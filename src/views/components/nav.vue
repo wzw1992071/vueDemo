@@ -138,13 +138,13 @@ export default {
                         {index:"6-1",  name:"供应商付款" ,path:"/sellerPayment"}
                     ]
                 }
-                // ,{ 
-                //     index:"5",  
-                //     name:"物流配送单",
-                //     childs:[
-                //         {index:"5-1",  name:"发送物流单" ,path:"/logisticsed"}
-                //     ]
-                // }
+                ,{ 
+                    index:"7",  
+                    name:"收货人管理",
+                    childs:[
+                        {index:"7-1",  name:"收货人列表" ,path:"/consigneeList"}
+                    ]
+                }
         ]
     }
   },

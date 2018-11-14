@@ -1,6 +1,7 @@
 // 销售收款退货页面
 <template>
     <div class="mainBox">
+       <form  id="searchForm" :action="formAction" method="get" target="_blank">
         <div class="searchBox">
             <div class="searchArea">
               <div class="demo-input-suffix">
@@ -9,6 +10,7 @@
                     <div class="block">
                     <el-date-picker
                         v-model="searchParam.order_start_date"
+                        name="order_start_date"
                         type="date"
                         @change="getDataTips"
                         placeholder="订单开始日期">
@@ -18,6 +20,7 @@
                     <div class="block">
                     <el-date-picker
                         v-model="searchParam.order_end_date"
+                        name="order_end_date"
                         type="date"
                         @change="getDataTips"
                         placeholder="订单结束日期">
@@ -32,20 +35,21 @@
               <div class="demo-input-suffix">
                 <span>客户名：</span>  
                 <el-autocomplete 
+                  name="buyer"
                   v-model="searchParam.buyer"
                   :fetch-suggestions="queryBuyerName"
-                  :trigger-on-focus="false"
+                  :trigger-on-focus="true"
                   >
                 </el-autocomplete>
 
               </div>
               <div class="demo-input-suffix">
                   <span>订单号：</span>  
-                  <el-input v-model="searchParam.order_no" ></el-input>
+                  <el-input name="order_no" v-model="searchParam.order_no" ></el-input>
               </div>
               <div class="selecDiv">
                   <span>收款状态：</span>
-                  <el-select class="" v-model="searchParam.proceeds_status"  clearable  placeholder="请选择">
+                  <el-select class="" name="proceeds_status" v-model="searchParam.proceeds_status"  clearable  placeholder="请选择">
                     <el-option
                       v-for="item in selectData.proceeds_status"
                       :key="item.id"
@@ -62,6 +66,7 @@
                       <div class="block">
                       <el-date-picker
                           v-model="searchParam.proceeds_start_date"
+                          name="proceeds_start_date"
                           type="date"
                           placeholder="订单开始日期">
                       </el-date-picker>
@@ -70,6 +75,7 @@
                       <div class="block">
                       <el-date-picker
                           v-model="searchParam.proceeds_end_date"
+                          name="proceeds_end_date"
                           type="date"
                           placeholder="订单结束日期">
                       </el-date-picker>
@@ -79,9 +85,11 @@
               <div class="btnGuoup">
                   <el-button type="success" icon="el-icon-search" @click="search">确认</el-button>
                   <el-button type="primary" icon="el-icon-edit" @click="moreSure">批量确认</el-button>
+                  <el-button type="primary" icon="el-icon-document" @click="exportMsg">导出</el-button>
               </div>
           </div>
         </div>
+       </form>
         <!-- 表单 -->
         <div class="tableArea">
            <el-table
@@ -236,7 +244,7 @@
                     min-width="120"
                     align="center">
                       <template slot-scope="scope">
-                        <el-input v-model.number="scope.row.back_price" @change="countTotal(scope.$index)"></el-input>
+                        <el-input v-model.number="scope.row.goods_sell_price/100" @change="countTotal(scope.$index)"></el-input>
                       </template>
                   </el-table-column>
                   <el-table-column
@@ -293,6 +301,17 @@ export default {
       // 退款相关数据
       returnData: []
     };
+  },
+  computed: {
+    formAction() {
+      let url = "";
+      if (window.location.hostname == "localhost") {
+        url = "/api/provider/proceeds-back/export";
+      } else {
+        url = "/provider/proceeds-back/export";
+      }
+      return url;
+    }
   },
   methods: {
     // 请求页面列表数据
@@ -538,12 +557,15 @@ export default {
             });
             return false;
           }
-          let obj = {};
-          obj.goods_number = item.goods_number;
-          obj.back_num = item.back_num;
-          obj.back_price = item.back_price * 100;
-          obj.back_amount = item.back_amount * 100;
-          sendParam.push(obj);
+          if(item.back_num>0){
+            let obj = {};
+            obj.goods_number = item.goods_number;
+            obj.back_num = item.back_num;
+            obj.back_price = item.back_price * 100;
+            obj.back_amount = item.back_amount * 100;
+            sendParam.push(obj);
+          }
+          
         });
         this.$axios
           .post("/provider/goods-back", sendParam)
@@ -572,7 +594,11 @@ export default {
     cancel() {
       this.dialogFormVisible1 = false;
       this.returnData = [];
-    }
+    },
+    // 导出功能
+    exportMsg(){
+      this.$el.querySelector("#searchForm").submit();
+    },
   },
   created() {
     this.search();
@@ -588,7 +614,7 @@ export default {
   #searchForm {
     border-bottom: 1px solid #ccc;
     & > div {
-      height: 50px;
+      // height: 50px;
       span {
         height: 50px;
       }

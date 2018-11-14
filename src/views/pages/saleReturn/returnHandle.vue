@@ -1,6 +1,7 @@
 // 供应商退货单页面
 <template>
     <div class="mainBox">
+       <form  id="searchForm" :action="formAction" method="get" target="_blank">
         <div class="searchArea">
               <div class="demo-input-suffix">
                 <span>日期：</span>  
@@ -8,6 +9,7 @@
                     <div class="block">
                     <el-date-picker
                         v-model="searchParam.back_date"
+                        name="back_date"
                         type="date"
                         @change="getDataTips"
                         placeholder="请选择日期">
@@ -28,6 +30,7 @@
               <el-select
                 v-model="searchParam.goods_name"
                 style="width: 350px;"
+                name="goods_name"
                 filterable
                 multiple
                 collapse-tags>
@@ -42,19 +45,20 @@
             </div>
             <div class="demo-input-suffix">
               <span>供应商：</span>  
-              <!-- <el-input v-model="searchParam.seller" name="seller"></el-input> -->
               <el-autocomplete 
                 v-model="searchParam.seller"
                 name="seller"
                 :fetch-suggestions="querySellerName"
-                :trigger-on-focus="false"
+                :trigger-on-focus="true"
                 >
               </el-autocomplete>
             </div>
             <div class="btnGuoup">
                   <el-button type="success" icon="el-icon-search" @click="search">确认</el-button>
+                  <el-button type="primary" icon="el-icon-document" @click="exportMsg">导出</el-button>
               </div>
         </div>
+       </form>
          <!-- 表单 -->
         <div class="tableArea">
           <el-table
@@ -120,6 +124,7 @@
                   <template slot-scope="scope">
                     <el-button v-if="scope.row.status==1" @click="returnHandle(scope.row,1)" type="text">退供应商</el-button>
                     <el-button v-if="scope.row.status==1" @click="returnHandle(scope.row,5)" type="text">入库</el-button>
+                    
                   </template>
               </el-table-column>
           </el-table>
@@ -172,116 +177,131 @@ export default {
       dataTotal: 20
     };
   },
+  computed: {
+    formAction() {
+      let url = "";
+      if (window.location.hostname == "localhost") {
+        url = "/api/provider/goods-back/export";
+      } else {
+        url = "/provider/goods-back/export";
+      }
+      return url;
+    }
+  },
   methods:{
-      search(){
-        let sendParam=JSON.parse(JSON.stringify(this.searchParam));
-        if (sendParam.back_date) {
-          sendParam.back_date = $tools.dateFormat(
-            sendParam.back_date
-          );
+    search(){
+      let sendParam=JSON.parse(JSON.stringify(this.searchParam));
+      if (sendParam.back_date) {
+        sendParam.back_date = $tools.dateFormat(
+          sendParam.back_date
+        );
+      }
+      for (var i in sendParam) {
+        if (!sendParam[i]) {
+          delete sendParam[i];
         }
-        for (var i in sendParam) {
-          if (!sendParam[i]) {
-            delete sendParam[i];
-          }
-        }
-        this.$axios
-        .get("/provider/goods-back/list", { params: sendParam })
-        .then(r => {
+      }
+      this.$axios
+      .get("/provider/goods-back/list", { params: sendParam })
+      .then(r => {
 
-          this.dataTotal = r.data.data.goods.total;
-          this.searchParam.page = r.data.data.goods.page
-            ? r.data.data.goods.page
-            : this.searchParam.page;
-          this.tableData = r.data.data.goods.goods;
-          this.tableData.forEach((item,index)=>{
-            item.statusName=this.codaText[item.status]
-          })
+        this.dataTotal = r.data.data.goods.total;
+        this.searchParam.page = r.data.data.goods.page
+          ? r.data.data.goods.page
+          : this.searchParam.page;
+        this.tableData = r.data.data.goods.goods;
+        this.tableData.forEach((item,index)=>{
+          item.statusName=this.codaText[item.status]
         })
-        .catch(err => {
+      })
+      .catch(err => {
+        this.$message.error({
+          message: "获取数据失败！"
+        });
+        console.log(`获取数据失败！+${err}`);
+      });
+    },
+      // 获取搜索栏数据提示
+    getDataTips() {
+      
+        let sendParam = {};
+        if (this.searchParam.back_date) {
+          sendParam.date = $tools.dateFormat(this.searchParam.back_date);
+        }
+        
+        this.$axios
+          .get("/provider/scope/goods-back/list", {
+            params: sendParam
+          })
+          .then(res => {
+
+            this.tips.sellerTips=[];
+            this.selectData.goods=[]
+
+            res.data.data.sellers.forEach((item,index)=>{
+              this.tips.sellerTips.push({
+                name:item
+              })
+            })
+            res.data.data.goods.forEach((item,index)=>{
+              this.selectData.goods.push({
+                value:item
+              })
+            })
+          })
+          .catch(err => {
+            console.log(err);
+            this.$message.error({
+              message: "获取提示失败！"
+            });
+          });
+    
+    },
+    // 卖家提示
+    querySellerName(queryString, cb){
+      let restaurants = this.tips.sellerTips;
+      let results = queryString
+        ? restaurants.filter($tools.createFilter(queryString, "name"))
+        : restaurants;
+      let a = [];
+      results.forEach(function(item, index) {
+        a.push({
+          value: item.name,
+        
+        });
+      });
+      cb(a);
+    },
+
+    // 退货订单处理
+    returnHandle(item,type){
+      // console.log(item)
+      this.$axios
+        .post("/provider/goods-back/deal-with", {
+          type:type,
+          goods_numbers:[item.goods_number]
+        }).then(r=>{
+          this.$message({
+            message: "操作成功！",
+            type: "success"
+          });
+          this.search();
+        }).catch(err => {
           this.$message.error({
-            message: "获取数据失败！"
+            message: "操作失败！"
           });
           console.log(`获取数据失败！+${err}`);
         });
-      },
-       // 获取搜索栏数据提示
-      getDataTips() {
-       
-          let sendParam = {};
-          if (this.searchParam.back_date) {
-            sendParam.date = $tools.dateFormat(this.searchParam.back_date);
-          }
-         
-          this.$axios
-            .get("/provider/scope/goods-back/list", {
-              params: sendParam
-            })
-            .then(res => {
-
-              this.tips.sellerTips=[];
-              this.selectData.goods=[]
-
-              res.data.data.sellers.forEach((item,index)=>{
-                this.tips.sellerTips.push({
-                  name:item
-                })
-              })
-              res.data.data.goods.forEach((item,index)=>{
-                this.selectData.goods.push({
-                  value:item
-                })
-              })
-            })
-            .catch(err => {
-              console.log(err);
-              this.$message.error({
-                message: "获取提示失败！"
-              });
-            });
       
-      },
-      // 卖家提示
-      querySellerName(queryString, cb){
-        let restaurants = this.tips.sellerTips;
-        let results = queryString
-          ? restaurants.filter($tools.createFilter(queryString, "name"))
-          : restaurants;
-        let a = [];
-        results.forEach(function(item, index) {
-          a.push({
-            value: item.name,
-          
-          });
-        });
-        cb(a);
-      },
-
-      // 退货订单处理
-      returnHandle(item,type){
-        // console.log(item)
-        this.$axios
-          .post("/provider/goods-back/deal-with", {
-            type:type,
-            goods_numbers:[item.goods_number]
-          }).then(r=>{
-            this.$message({
-              message: "操作成功！",
-              type: "success"
-            });
-            this.search();
-          }).catch(err => {
-            this.$message.error({
-              message: "操作失败！"
-            });
-            console.log(`获取数据失败！+${err}`);
-          });
-        
-      },
-      pageChange(page){    
-        this.searchParam.page = page;
-        this.search();
-      }
+    },
+    pageChange(page){    
+      this.searchParam.page = page;
+      this.search();
+    },
+      // 导出功能
+    exportMsg(){
+      this.$el.querySelector("#searchForm").submit();
+    },
   },
   created() {
     this.getDataTips();
@@ -297,7 +317,7 @@ export default {
   #searchForm {
     border-bottom: 1px solid #ccc;
     & > div {
-      height: 50px;
+      // height: 50px;
       span {
         height: 50px;
       }

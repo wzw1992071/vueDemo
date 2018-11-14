@@ -35,7 +35,7 @@
               v-model="searchParam.seller"
               name="seller"
               :fetch-suggestions="querySellerName"
-              :trigger-on-focus="false"
+              :trigger-on-focus="true"
               >
             </el-autocomplete>
           </div>
@@ -45,7 +45,7 @@
               v-model="searchParam.buyer"
               name="buyer"
               :fetch-suggestions="queryBuyerName"
-              :trigger-on-focus="false"
+              :trigger-on-focus="true"
               >
             </el-autocomplete>
             <!-- <el-input v-model="searchParam.buyer" name="buyer"></el-input> -->
@@ -90,7 +90,8 @@
                 :value="item.id">
               </el-option>
             </el-select>
-            <div class="selecDiv">
+           </div>
+          <div class="selecDiv">
             <span>采购方式：</span>
             <el-select class="" v-model="searchParam.purchases_mode" name="status" clearable  placeholder="请选择">
               <el-option
@@ -100,7 +101,6 @@
                 :value="item.id">
               </el-option>
             </el-select>
-          </div>
           </div>
           <div class="btnGuoup">
             <el-button type="success" icon="el-icon-search" @click="search">确认</el-button>

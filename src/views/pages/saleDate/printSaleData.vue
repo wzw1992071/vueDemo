@@ -33,7 +33,7 @@
              <el-autocomplete 
               v-model="searchParam.buyer"
               :fetch-suggestions="queryBuyerName"
-              :trigger-on-focus="false"
+              :trigger-on-focus="true"
               >
             </el-autocomplete>
           </div>

@@ -69,6 +69,11 @@ export default new Router({
         {
           path: 'sellerPayment',
           component: _import('pages/sellerPayment/sellerPayment')
+        },
+        //收货人列表
+        {
+          path: 'consigneeList',
+          component: _import('pages/consigneeManage/consigneeList')
         }
       ]
       
