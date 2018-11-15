@@ -144,6 +144,13 @@ export default {
                     childs:[
                         {index:"7-1",  name:"收货人列表" ,path:"/consigneeList"}
                     ]
+                },
+                { 
+                    index:"8",  
+                    name:"报表数据",
+                    childs:[
+                        {index:"8-1",  name:"每日订单" ,path:"/dayReport"}
+                    ]
                 }
         ]
     }

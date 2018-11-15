@@ -446,14 +446,14 @@ export default {
           totalMoney += item.pay_amount;
           sendParam.push({
             goods_number: item.goods_number,
-            pay_amount: item.pay_amount * 100
+            pay_amount: this.$utils.yuanTofen(item.pay_amount)
           });
         });
       } else {
         totalMoney += items.pay_amount;
         sendParam.push({
           goods_number: items.goods_number,
-          pay_amount: items.pay_amount * 100
+          pay_amount: this.$utils.yuanTofen(items.pay_amount)
         });
       }
       // console.log(sendParam)

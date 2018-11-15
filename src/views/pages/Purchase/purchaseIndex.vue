@@ -651,10 +651,10 @@ export default {
       } else {
         // 如果有价格，价格要转化为分
         if (sendParam.purchases_price) {
-          sendParam.purchases_price = sendParam.purchases_price * 100;
+          sendParam.purchases_price = this.$utils.yuanTofen(sendParam.purchases_price);
         }
         if (sendParam.goods_sell_price) {
-          sendParam.goods_sell_price = sendParam.goods_sell_price * 100;
+          sendParam.goods_sell_price = this.$utils.yuanTofen(sendParam.goods_sell_price);
         }
         this.$axios
           .post("/provider/purchases/update", [

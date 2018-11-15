@@ -17,7 +17,9 @@ import 'element-ui/lib/theme-chalk/index.css';
 // 引入全局的指令和过滤器
 import directives from "src/directives.js"
 import "src/filters.js"
-
+// 引入公共方法
+import utils from "@/utils/utils.js"
+Vue.prototype.$utils = utils
 
 Vue.use(ElementUI);
 

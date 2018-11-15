@@ -668,8 +668,8 @@ export default {
       // })
       if (flag) {
         this.addGoodsInfo.goods.forEach(function(value, i) {
-          value.goods_sell_price = value.goods_sell_price * 100;
-          value.original_price = value.original_price * 100;
+          value.goods_sell_price = this.$utils.yuanTofen(value.goods_sell_price);
+          value.original_price = this.$utils.yuanTofen(value.original_price);
         });
         this.$axios
           .post("/provider/allocation/order/goods/add", that.addGoodsInfo)
@@ -686,8 +686,8 @@ export default {
                 message: "添加失败！"
               });
               that.addGoodsInfo.goods.forEach(function(value, i) {
-                value.goods_sell_price = value.goods_sell_price / 100;
-                value.original_price = value.original_price / 100;
+                value.goods_sell_price = this.$utils.yuanTofen(value.goods_sell_price);
+                value.original_price = this.$utils.yuanTofen(value.original_price);
               });
             }
           })
@@ -821,10 +821,10 @@ export default {
         that.addOrderInfo.order.consign_date = $tools.dateFormat(
           that.addOrderInfo.order.consign_date
         );
-        that.addOrderInfo.order.freight = that.addOrderInfo.order.freight * 100;
+        that.addOrderInfo.order.freight = this.$utils.yuanTofen(that.addOrderInfo.order.freight);
         that.addOrderInfo.goods.forEach(function(value, i) {
-          value.goods_sell_price = value.goods_sell_price * 100;
-          value.original_price = value.original_price * 100;
+          value.goods_sell_price = this.$utils.yuanTofen(value.goods_sell_price);
+          value.original_price = this.$utils.yuanTofen(value.original_price);
         });
         if(!that.addOrderInfo.order.receipt_area){
           that.addOrderInfo.order.receipt_area=that.addOrderInfo.order.receipt_area_code

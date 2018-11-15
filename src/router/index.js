@@ -74,7 +74,13 @@ export default new Router({
         {
           path: 'consigneeList',
           component: _import('pages/consigneeManage/consigneeList')
-        }
+        },
+        // 统计日报
+        // 每日订单
+        {
+          path: 'dayReport',
+          component: _import('pages/reportData/dayReport')
+        },
       ]
       
     }

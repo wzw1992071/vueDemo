@@ -230,21 +230,19 @@
                     align="center">
                   </el-table-column>
                   <el-table-column
-                    prop="back_num"
                     label="退货数量"
                     min-width="120"
                     align="center">
                       <template slot-scope="scope">
-                        <el-input v-model.number="scope.row.back_num" @change="countTotal(scope.$index)"></el-input>
+                        <el-input v-model="scope.row.back_num" @change="countTotal(scope.$index)"></el-input>
                       </template>
                   </el-table-column>
                   <el-table-column
-                    prop="back_price"
                     label="单价"
                     min-width="120"
                     align="center">
                       <template slot-scope="scope">
-                        <el-input v-model.number="scope.row.goods_sell_price/100" @change="countTotal(scope.$index)"></el-input>
+                        <el-input v-model="scope.row.back_price" @change="countTotal(scope.$index)"></el-input>
                       </template>
                   </el-table-column>
                   <el-table-column
@@ -285,8 +283,8 @@ export default {
         proceeds_status: [{ id: 1, name: "未收款" }, { id: 2, name: "已收款" }]
       },
       // 输入提示内容
-      tips:{
-        buyerTips:[],
+      tips: {
+        buyerTips: []
       },
       // 表格数据
       tableData: [],
@@ -373,28 +371,34 @@ export default {
       this.searchParam.page = page;
       this.search();
     },
-       // 获取搜索栏数据提示
+    // 获取搜索栏数据提示
     getDataTips() {
-      if (this.searchParam.order_end_date >= this.searchParam.order_start_date) {
+      if (
+        this.searchParam.order_end_date >= this.searchParam.order_start_date
+      ) {
         let sendParam = {};
         if (this.searchParam.order_start_date) {
-          sendParam.start_date = $tools.dateFormat(this.searchParam.order_start_date);
+          sendParam.start_date = $tools.dateFormat(
+            this.searchParam.order_start_date
+          );
         }
         if (this.searchParam.order_end_date) {
-          sendParam.end_date = $tools.dateFormat(this.searchParam.order_end_date);
+          sendParam.end_date = $tools.dateFormat(
+            this.searchParam.order_end_date
+          );
         }
         this.$axios
           .get("/provider/order/goods/scopescreen/list", {
             params: sendParam
           })
           .then(res => {
-            this.tips.buyerTips=[];
-            this.tips.sellerTips=[];
-            res.data.data.buyers.forEach((item,index)=>{
+            this.tips.buyerTips = [];
+            this.tips.sellerTips = [];
+            res.data.data.buyers.forEach((item, index) => {
               this.tips.buyerTips.push({
-                name:item
-              })
-            })
+                name: item
+              });
+            });
           })
           .catch(err => {
             console.log(err);
@@ -409,7 +413,7 @@ export default {
       }
     },
     // 买家提示
-    queryBuyerName(queryString, cb){
+    queryBuyerName(queryString, cb) {
       let restaurants = this.tips.buyerTips;
       let results = queryString
         ? restaurants.filter($tools.createFilter(queryString, "name"))
@@ -417,8 +421,7 @@ export default {
       let a = [];
       results.forEach(function(item, index) {
         a.push({
-          value: item.name,
-        
+          value: item.name
         });
       });
       cb(a);
@@ -448,34 +451,32 @@ export default {
       let sendParam = [];
       if (items.length) {
         items.forEach((item, index) => {
-          if(item.remark){
+          if (item.remark) {
             sendParam.push({
               order_no: item.order_no,
-              proceeds_amount: item.receivable_amount * 100,
+              proceeds_amount: this.$utils.yuanTofen(item.receivable_amount),
               remark: item.remark
             });
-          }else{
+          } else {
             sendParam.push({
               order_no: item.order_no,
-              proceeds_amount: item.receivable_amount * 100,
+              proceeds_amount: this.$utils.yuanTofen(item.receivable_amount)
             });
           }
-          
         });
       } else {
-        if(items.remark){
+        if (items.remark) {
           sendParam.push({
             order_no: items.order_no,
-            proceeds_amount: items.receivable_amount * 100,
+            proceeds_amount: this.$utils.yuanTofen(items.receivable_amount),
             remark: items.remark
           });
-        }else{
+        } else {
           sendParam.push({
             order_no: items.order_no,
-            proceeds_amount: items.receivable_amount * 100,
+            proceeds_amount: this.$utils.yuanTofen(items.receivable_amount)
           });
         }
-        
       }
       this.$confirm("确认收款后将不可更改，是否确认收款？", "确认收款", {
         confirmButtonText: "确定",
@@ -510,6 +511,7 @@ export default {
     returnGoods(item) {
       // this.dialogFormVisible1=true;
       // this.returnData = JSON.parse(JSON.stringify(item))
+
       let returnMoney = item.order_amount;
       this.$axios
         .get("/provider/order/goods/list", {
@@ -518,10 +520,9 @@ export default {
         .then(r => {
           if (r.data.message == "OK") {
             this.returnData = r.data.data.goods;
-            console.log(this.returnData)
             this.returnData.forEach((item, index) => {
               item.back_num = 0;
-              item.back_price =returnMoney;
+              item.back_price = item.goods_sell_price / 100;
               item.back_amount = 0;
             });
             this.dialogFormVisible1 = true;
@@ -547,7 +548,6 @@ export default {
     },
     // 退货确认
     sureDelete() {
-      console.log(this.returnData);
       let sendParam = [];
       if (this.returnData.length > 0) {
         this.returnData.forEach((item, index) => {
@@ -557,15 +557,14 @@ export default {
             });
             return false;
           }
-          if(item.back_num>0){
+          if (item.back_num > 0) {
             let obj = {};
             obj.goods_number = item.goods_number;
             obj.back_num = item.back_num;
-            obj.back_price = item.back_price * 100;
-            obj.back_amount = item.back_amount * 100;
+            obj.back_price = this.$utils.yuanTofen(item.back_price);
+            obj.back_amount = this.$utils.yuanTofen(item.back_amount);
             sendParam.push(obj);
           }
-          
         });
         this.$axios
           .post("/provider/goods-back", sendParam)
@@ -596,9 +595,9 @@ export default {
       this.returnData = [];
     },
     // 导出功能
-    exportMsg(){
+    exportMsg() {
       this.$el.querySelector("#searchForm").submit();
-    },
+    }
   },
   created() {
     this.search();
