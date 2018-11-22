@@ -90,7 +90,13 @@
               <el-table-column
                 prop="back_num"
                 label="数量"
-                min-width="120"
+                min-width="80"
+                align="center">
+              </el-table-column>
+              <el-table-column
+                prop="purchases_price"
+                label="采购价"
+                min-width="80"
                 align="center">
               </el-table-column>
               <el-table-column
@@ -139,6 +145,21 @@
               :total="dataTotal">
             </el-pagination>
         </div>
+        <el-dialog
+          title="提示"
+          :visible.sync="dialogVisible"
+          width="30%"
+          >
+          <div class="flex">
+            <div style="width:100px;line-height:40px">退款金额：</div>
+            <el-input v-model.number="returnData.amount" width="150px"></el-input>
+          </div>
+          
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="returnGood">确 定</el-button>
+          </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -174,7 +195,14 @@ export default {
         20:"已退供应商",
       },
       // 表格总数
-      dataTotal: 20
+      dataTotal: 20,
+      // 退货弹窗数据
+      returnData:{
+        type:"",
+        goods_no:"",
+        amount:0
+      },
+      dialogVisible:false
     };
   },
   computed: {
@@ -212,6 +240,7 @@ export default {
         this.tableData = r.data.data.goods.goods;
         this.tableData.forEach((item,index)=>{
           item.statusName=this.codaText[item.status]
+          item.purchases_price=(item.purchases_price/100).toFixed(2)
         })
       })
       .catch(err => {
@@ -275,11 +304,17 @@ export default {
 
     // 退货订单处理
     returnHandle(item,type){
-      // console.log(item)
-      this.$axios
+      if(type==5){
+      //   let sendParam = JSON.parse(
+      //   JSON.stringify(data)
+      // );
+        this.$axios
         .post("/provider/goods-back/deal-with", {
-          type:type,
-          goods_numbers:[item.goods_number]
+          type:5,
+          refund_info:[{
+            goods_no:item.goods_number,
+            amount:0
+          }]
         }).then(r=>{
           this.$message({
             message: "操作成功！",
@@ -292,7 +327,40 @@ export default {
           });
           console.log(`获取数据失败！+${err}`);
         });
+      }else{
+         this.returnData={
+          type:1,
+          goods_no:item.goods_number,
+          amount:0
+        }
+        this.dialogVisible=true
+      }
+     
       
+    },
+    returnGood(){
+      if(this.returnData.amount<0) return false;
+      let sendParam ={
+        type:1,
+        refund_info:[{
+          goods_no:this.returnData.goods_no,
+          amount:this.$utils.yuanTofen(this.returnData.amount)
+        }]
+      }
+      this.$axios
+        .post("/provider/goods-back/deal-with",sendParam).then(r=>{
+          this.$message({
+            message: "操作成功！",
+            type: "success"
+          });
+          this.dialogVisible=false
+          this.search();
+        }).catch(err => {
+          this.$message.error({
+            message: "操作失败！"
+          });
+          console.log(`获取数据失败！+${err}`);
+        });
     },
     pageChange(page){    
       this.searchParam.page = page;

@@ -241,22 +241,20 @@
 
       <!-- 修改供应商弹出框（批量修改） -->
       <el-dialog title="修改资料" :visible.sync="dialogFormVisible2" width="60%">
-
           <el-row class="oneLine">
-            <el-col :span="20"><div class="grid-content inputGroup">
-                <el-col :span="6"><div class="inputTitle">供应商名称：</div></el-col>
-                <el-col :span="18"><el-input v-model="changeSellData.seller_shop"></el-input></el-col>
+            <el-col :span="12"><div class="grid-content inputGroup">
+                <el-col :span="6"><div class="inputTitle">采购日期：</div></el-col>
+                <el-col :span="18">
+                  <el-date-picker
+                    v-model="changeSellData.purchases_date"
+                    name="start_date"
+                    type="date"
+                    @change="getDataTips"
+                    placeholder="开始日期">
+                  </el-date-picker>
+                </el-col>
             </div></el-col>
-            
-          </el-row>   
-          <el-row class="oneLine">
-            <el-col :span="20"><div class="grid-content inputGroup">
-                <el-col :span="6"><div class="inputTitle">供应商名称电话：</div></el-col>
-                <el-col :span="18"><el-input v-model="changeSellData.seller_tel"></el-input></el-col>
-            </div></el-col>
-          </el-row> 
-          <el-row class="oneLine">
-            <el-col :span="20">
+            <el-col :span="12">
               <div class="grid-content inputGroup">                
                 <el-col :span="6"><div class="inputTitle">采购方式：</div></el-col>
                 <el-col :span="18">
@@ -272,6 +270,32 @@
               </div>
             </el-col>
           </el-row>   
+          <el-row class="oneLine">
+            <el-col :span="12"><div class="grid-content inputGroup">
+                <el-col :span="6"><div class="inputTitle">供应商名称：</div></el-col>
+                <el-col :span="18"><el-input v-model="changeSellData.seller_shop"></el-input></el-col>
+            </div></el-col>
+            <el-col :span="12"><div class="grid-content inputGroup">
+                <el-col :span="6"><div class="inputTitle">供应商电话：</div></el-col>
+                <el-col :span="18"><el-input v-model="changeSellData.seller_tel"></el-input></el-col>
+            </div></el-col>
+          </el-row>   
+          <el-row class="oneLine">
+           <el-col :span="12"><div class="grid-content inputGroup">
+                <el-col :span="6"><div class="inputTitle">采购状态：</div></el-col>
+                 <el-col :span="18">
+                  <el-select v-model="changeSellData.status" placeholder="请选择">
+                    <el-option
+                      v-for="item in selectData.status"
+                      :key="item.value"
+                      :label="item.name"
+                      :value="item.id">
+                    </el-option>
+                  </el-select>
+                </el-col>
+            </div></el-col>
+          </el-row> 
+         
 
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="changeSeller">确 定</el-button>
@@ -351,6 +375,20 @@
                 </el-col>
             </div></el-col>
           </el-row>  
+          <el-row class="oneLine">
+            <el-col :span="12"><div class="grid-content inputGroup">
+                <el-col :span="6"><div class="inputTitle">采购日期：</div></el-col>
+                <el-col :span="18">
+                  <el-date-picker
+                    v-model="changeData.purchases_date"
+                    name="start_date"
+                    type="date"
+                    @change="getDataTips"
+                 >
+                  </el-date-picker>
+                </el-col>
+            </div></el-col>
+          </el-row>
         </div>
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="submintForm">确 定</el-button>
@@ -418,8 +456,10 @@ export default {
       dialogFormVisible2: false,
       // 批量修改参数
       changeSellData: {
+        purchases_date:new Date(),//采购日期
         seller_shop: "", //供货商店名
         seller_tel: "", //供货商电话
+        status:"",//采购状态
         purchases_mode: "" //采购方式
       }
     };
@@ -630,6 +670,7 @@ export default {
       this.changeData.goods_sell_price = (
         this.changeData.goods_sell_price / 100
       ).toFixed(2);
+      this.changeData.purchases_date = new Date(this.changeData.purchases_date)
       this.changeDataOld = JSON.parse(JSON.stringify(data));
       this.dialogFormVisible = true;
     },
@@ -655,6 +696,9 @@ export default {
         }
         if (sendParam.goods_sell_price) {
           sendParam.goods_sell_price = this.$utils.yuanTofen(sendParam.goods_sell_price);
+        }
+        if (sendParam.purchases_date) {
+          sendParam.purchases_date = $tools.dateFormat(sendParam.purchases_date)
         }
         this.$axios
           .post("/provider/purchases/update", [
@@ -686,9 +730,11 @@ export default {
         this.dialogFormVisible2 = true;
         // 弹出框数据清零
         this.changeSellData = {
+          purchases_date:new Date(),
           seller_shop: "", //供货商店名
           seller_tel: "", //供货商电话
-          purchases_mode: 3
+          purchases_mode: 3,
+          status:1
         };
       } else {
         this.$message({
@@ -760,6 +806,12 @@ export default {
         : "";
       this.changeSellData.purchases_mode
         ? (sendParam.values.purchases_mode = this.changeSellData.purchases_mode)
+        : "";
+      this.changeSellData.status
+        ? (sendParam.values.status = this.changeSellData.status)
+        : "";
+      this.changeSellData.purchases_date
+        ? (sendParam.values.purchases_date =$tools.dateFormat(this.changeSellData.purchases_date))
         : "";
       // console.log(sendParam)
       this.$axios

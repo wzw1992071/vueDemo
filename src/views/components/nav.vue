@@ -149,7 +149,9 @@ export default {
                     index:"8",  
                     name:"报表数据",
                     childs:[
-                        {index:"8-1",  name:"每日订单" ,path:"/dayReport"}
+                        {index:"8-1",  name:"每日订单" ,path:"/dayReport"},
+                        {index:"8-2",  name:"资金报表" ,path:"/moneyReport"},
+                        {index:"8-3",  name:"报表填写" ,path:"/fillInReport"}
                     ]
                 }
         ]

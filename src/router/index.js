@@ -81,6 +81,16 @@ export default new Router({
           path: 'dayReport',
           component: _import('pages/reportData/dayReport')
         },
+        // 每日账单
+        {
+          path: 'moneyReport',
+          component: _import('pages/reportData/moneyReport')
+        },
+        // 报表填写
+        {
+          path: 'fillInReport',
+          component: _import('pages/reportData/fillInReport')
+        },
       ]
       
     }

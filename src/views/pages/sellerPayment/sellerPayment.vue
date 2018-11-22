@@ -166,6 +166,12 @@
                 min-width="120"
                 align="center">
               </el-table-column>
+               <el-table-column
+                prop="acceptance_num"
+                label="到货数量"
+                min-width="120"
+                align="center">
+              </el-table-column>
               <el-table-column
                 prop="purchases_price"
                 label="单价"

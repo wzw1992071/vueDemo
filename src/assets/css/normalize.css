@@ -17,3 +17,6 @@ a:hover {color: #00FF00; text-decoration:underline;}
 a:active {color: #0000FF; text-decoration:underline;}*/
 a{color: #000;}
 .wrapper{clear: both;width: 100%;}
+.flex{
+    display: flex
+}

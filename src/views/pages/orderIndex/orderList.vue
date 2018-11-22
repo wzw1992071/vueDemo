@@ -667,7 +667,7 @@ export default {
       //   }
       // })
       if (flag) {
-        this.addGoodsInfo.goods.forEach(function(value, i) {
+        this.addGoodsInfo.goods.forEach((value, i)=> {
           value.goods_sell_price = this.$utils.yuanTofen(value.goods_sell_price);
           value.original_price = this.$utils.yuanTofen(value.original_price);
         });
@@ -685,7 +685,7 @@ export default {
               that.$message.error({
                 message: "添加失败！"
               });
-              that.addGoodsInfo.goods.forEach(function(value, i) {
+              that.addGoodsInfo.goods.forEach((value, i)=> {
                 value.goods_sell_price = this.$utils.yuanTofen(value.goods_sell_price);
                 value.original_price = this.$utils.yuanTofen(value.original_price);
               });
@@ -822,7 +822,7 @@ export default {
           that.addOrderInfo.order.consign_date
         );
         that.addOrderInfo.order.freight = this.$utils.yuanTofen(that.addOrderInfo.order.freight);
-        that.addOrderInfo.goods.forEach(function(value, i) {
+        that.addOrderInfo.goods.forEach((value, i)=> {
           value.goods_sell_price = this.$utils.yuanTofen(value.goods_sell_price);
           value.original_price = this.$utils.yuanTofen(value.original_price);
         });
