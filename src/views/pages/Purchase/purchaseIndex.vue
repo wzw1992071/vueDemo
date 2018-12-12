@@ -122,13 +122,16 @@
           border
           align="center"
           ref="multipleTable"
+          @sort-change="sortChange"
           @selection-change="handleSelectionChange"
           >
          
            <el-table-column
             fixed
+            label="采购时间"
             type="selection"
             min-width="40">
+            
           </el-table-column>
            <el-table-column
             prop="goods_number"
@@ -189,8 +192,9 @@
           <el-table-column
             prop="purchases_price"
             label="采购价格"
-            min-width="80"
+            min-width="120"
             :formatter="formatter"
+            sortable="custom"
             align="center">
           </el-table-column>
           <el-table-column
@@ -484,8 +488,11 @@ export default {
       for (var i in sendParam) {
         if (!sendParam[i]) {
           delete sendParam[i];
+        }else if(sendParam[i].length==0) {
+          delete sendParam[i];
         }
       }
+      
       if (sendParam.start_date) {
         sendParam.start_date = $tools.dateFormat(sendParam.start_date);
       }
@@ -493,7 +500,7 @@ export default {
         sendParam.end_date = $tools.dateFormat(sendParam.end_date);
       }
       this.$axios
-        .get("/provider/allocate/purchases/list", { params: sendParam })
+        .post("/provider/allocate/purchases/list", sendParam)
         .then(function(r) {
           that.dataTotal = r.data.data.total;
           for (var i = 0; i < r.data.data.goods.length; i++) {
@@ -840,6 +847,26 @@ export default {
           console.log("获取数据失败");
           that.dialogFormVisible2 = false;
         });
+    },
+    sortChange(type){
+      // 
+      // console.log(type)
+      if(type.prop=="purchases_price"){
+        this.searchParam.sorts={};
+        switch(type.order){
+          case "ascending":
+          this.searchParam.sorts[type.prop]="A";
+          this.search();
+          break;
+          case "descending":
+          this.searchParam.sorts[type.prop]="D";
+          this.search();
+          break;
+        }
+      }else{
+        delete this.searchParam.sorts;
+        this.search();
+      }
     }
   },
   created() {

@@ -294,10 +294,20 @@
                     </el-select>
                 </el-form-item>  
                 </el-col>
-                 <el-col :span="7">
+                 <!-- <el-col :span="7">
                 <el-form-item label="配送区代号:" prop="receipt_area_code">
                     <el-input v-model="addOrderInfo.order.receipt_area_code" ></el-input>
                 </el-form-item>  
+                </el-col> -->
+                 <el-col :span="7">
+                  <el-form-item label="订单日期:" prop="consign_date">
+                      <!-- <el-input v-model="addOrderInfo.order.consign_date" ></el-input> -->
+                      <el-date-picker
+                        v-model="addOrderInfo.order.consign_date"
+                        type="date"
+                        placeholder="选择日期">
+                      </el-date-picker>
+                  </el-form-item>
                 </el-col>
             </el-row>    
             <el-row>
@@ -339,16 +349,7 @@
                 </el-col>
             </el-row> 
             <el-row>
-                <el-col :span="8">
-                  <el-form-item label="订单日期:" prop="consign_date">
-                      <!-- <el-input v-model="addOrderInfo.order.consign_date" ></el-input> -->
-                      <el-date-picker
-                        v-model="addOrderInfo.order.consign_date"
-                        type="date"
-                        placeholder="选择日期">
-                      </el-date-picker>
-                  </el-form-item>
-                </el-col>
+               
               
             </el-row>  
 
@@ -529,8 +530,8 @@ export default {
           province_id: "", //买家所在省ID
           city_id: "", //	买家所在市ID
           county_id: "", //买家所在区县ID
-          receipt_area: "", //配送区域 如：金牛区
-          receipt_area_code: "", //配送区域代号 如：Y_1
+          // receipt_area: "", //配送区域 如：金牛区
+          // receipt_area_code: "", //配送区域代号 如：Y_1
           consign_date: ""
         },
         goods: []
@@ -561,10 +562,10 @@ export default {
         county_id: [
           { required: true, message: "买家所在区县不能为空!", trigger: "blur" }
         ],
-        receipt_area_code: [
-          { required: true, message: "配送区域不能为空!", trigger: "blur" },
-          { min: 1, max: 5, message: "请输入正确的配送区域！", trigger: "blur" }
-        ]
+        // receipt_area_code: [
+        //   { required: true, message: "配送区域不能为空!", trigger: "blur" },
+        //   { min: 1, max: 5, message: "请输入正确的配送区域！", trigger: "blur" }
+        // ]
       }
     };
   },
@@ -653,8 +654,8 @@ export default {
     sumMoney2(i) {
       // console.log(i)
       this.addGoodsInfo.goods[i].totalMoney =
-        this.addGoodsInfo.goods[i].goods_sell_price *
-        this.addGoodsInfo.goods[i].buy_num;
+        (this.addGoodsInfo.goods[i].goods_sell_price *
+        this.addGoodsInfo.goods[i].buy_num).toFixed(2);
     },
     // 提交增加商品
     submitAddGoods() {
@@ -667,8 +668,10 @@ export default {
       //   }
       // })
       if (flag) {
-        this.addGoodsInfo.goods.forEach((value, i)=> {
-          value.goods_sell_price = this.$utils.yuanTofen(value.goods_sell_price);
+        this.addGoodsInfo.goods.forEach((value, i) => {
+          value.goods_sell_price = this.$utils.yuanTofen(
+            value.goods_sell_price
+          );
           value.original_price = this.$utils.yuanTofen(value.original_price);
         });
         this.$axios
@@ -685,9 +688,13 @@ export default {
               that.$message.error({
                 message: "添加失败！"
               });
-              that.addGoodsInfo.goods.forEach((value, i)=> {
-                value.goods_sell_price = this.$utils.yuanTofen(value.goods_sell_price);
-                value.original_price = this.$utils.yuanTofen(value.original_price);
+              that.addGoodsInfo.goods.forEach((value, i) => {
+                value.goods_sell_price = this.$utils.yuanTofen(
+                  value.goods_sell_price
+                );
+                value.original_price = this.$utils.yuanTofen(
+                  value.original_price
+                );
               });
             }
           })
@@ -707,7 +714,12 @@ export default {
     },
     // 添加订单
     addOrder() {
+     
       this.dialogFormVisible2 = true;
+      if(this.$refs.orderForm){
+        this.$refs.orderForm.resetFields()
+      }
+       
       this.openTime = new Date().getTime();
       this.addOrderInfo = {
         order: {
@@ -719,8 +731,8 @@ export default {
           province_id: "",
           city_id: "",
           county_id: "",
-          receipt_area: "",
-          receipt_area_code: "",
+          // receipt_area: "",
+          // receipt_area_code: "",
           consign_date: new Date()
         },
         goods: []
@@ -758,8 +770,8 @@ export default {
                 label: item.name
               });
             });
-            if((typeof cb)=="function"){
-              cb()
+            if (typeof cb == "function") {
+              cb();
             }
           })
           .catch(function(err) {
@@ -786,8 +798,8 @@ export default {
                 label: item.name
               });
             });
-            if((typeof cb)=="function"){
-              cb()
+            if (typeof cb == "function") {
+              cb();
             }
           })
           .catch(function(err) {
@@ -805,9 +817,9 @@ export default {
         let a = that.selectOptions.county_id.filter(
           item => item.value == that.addOrderInfo.order.county_id
         );
-        that.addOrderInfo.order.receipt_area = a[0].label;
+        // that.addOrderInfo.order.receipt_area = a[0].label;
       } else {
-        that.addOrderInfo.order.receipt_area = "";
+        // that.addOrderInfo.order.receipt_area = "";
       }
     },
 
@@ -821,14 +833,19 @@ export default {
         that.addOrderInfo.order.consign_date = $tools.dateFormat(
           that.addOrderInfo.order.consign_date
         );
-        that.addOrderInfo.order.freight = this.$utils.yuanTofen(that.addOrderInfo.order.freight);
-        that.addOrderInfo.goods.forEach((value, i)=> {
-          value.goods_sell_price = this.$utils.yuanTofen(value.goods_sell_price);
+        that.addOrderInfo.order.freight = this.$utils.yuanTofen(
+          that.addOrderInfo.order.freight
+        );
+        that.addOrderInfo.goods.forEach((value, i) => {
+          value.goods_sell_price = this.$utils.yuanTofen(
+            value.goods_sell_price
+          );
           value.original_price = this.$utils.yuanTofen(value.original_price);
         });
-        if(!that.addOrderInfo.order.receipt_area){
-          that.addOrderInfo.order.receipt_area=that.addOrderInfo.order.receipt_area_code
-        }
+        // if (!that.addOrderInfo.order.receipt_area) {
+        //   that.addOrderInfo.order.receipt_area =
+        //     that.addOrderInfo.order.receipt_area_code;
+        // }
         this.$axios
           .post("/provider/allocation/order/add", that.addOrderInfo)
           .then(function(r) {
@@ -885,15 +902,16 @@ export default {
           value: item.shop_name,
           tel: item.mobile_phone,
           id: item.id,
-          province_id:item.province_id,
-          city_id:item.city_id,
-          county_id:item.county_id
+          province_id: item.province_id,
+          city_id: item.city_id,
+          county_id: item.county_id
         });
       });
       cb(a);
     },
     handleSelectName(value) {
       this.addOrderInfo.order.buyer_tel = value.tel;
+      this.$refs.orderForm.validateField('buyer_shop_name');
       this.$axios
         .get("/custom/address/lists", {
           params: { id: value.id }
@@ -903,13 +921,13 @@ export default {
             this.shopAddressList = r.data.data;
             this.addOrderInfo.order.receipt_address =
               r.data.data[0].full_address;
-              this.addOrderInfo.order.province_id=value.province_id
-              this.provinceChange(()=>{
-                this.addOrderInfo.order.city_id=value.city_id
-                this.cityChange(()=>{
-                  this.addOrderInfo.order.county_id=value.county_id
-                })
-              })
+            this.addOrderInfo.order.province_id = value.province_id;
+            this.provinceChange(() => {
+              this.addOrderInfo.order.city_id = value.city_id;
+              this.cityChange(() => {
+                this.addOrderInfo.order.county_id = value.county_id;
+              });
+            });
             // console.log(value)
           }
         });
@@ -927,9 +945,9 @@ export default {
           shop_name: item.shop_name,
           tel: item.mobile_phone,
           id: item.id,
-          province_id:item.province_id,
-          city_id:item.city_id,
-          county_id:item.county_id
+          province_id: item.province_id,
+          city_id: item.city_id,
+          county_id: item.county_id
         });
       });
 
@@ -948,13 +966,13 @@ export default {
             this.shopAddressList = r.data.data;
             this.addOrderInfo.order.receipt_address =
               r.data.data[0].full_address;
-              this.addOrderInfo.order.province_id=value.province_id
-              this.provinceChange(()=>{
-                this.addOrderInfo.order.city_id=value.city_id
-                this.cityChange(()=>{
-                  this.addOrderInfo.order.county_id=value.county_id
-                })
-              })
+            this.addOrderInfo.order.province_id = value.province_id;
+            this.provinceChange(() => {
+              this.addOrderInfo.order.city_id = value.city_id;
+              this.cityChange(() => {
+                this.addOrderInfo.order.county_id = value.county_id;
+              });
+            });
             // console.log(value)
           }
         });
@@ -1018,7 +1036,7 @@ export default {
       this.addOrderInfo.goods[this.changeRowIndex].seller_address =
         value.seller_address;
       this.addOrderInfo.goods[this.changeRowIndex].original_price =
-        value.original_price;
+        value.original_price / 100;
     },
     // 得到当前行
     getRow(i) {
@@ -1027,8 +1045,8 @@ export default {
     // 计算总价
     sumMoney(i) {
       this.addOrderInfo.goods[i].totalMoney =
-        this.addOrderInfo.goods[i].goods_sell_price *
-        this.addOrderInfo.goods[i].buy_num;
+        (this.addOrderInfo.goods[i].goods_sell_price *
+        this.addOrderInfo.goods[i].buy_num).toFixed(2);
     },
 
     // 匹配规则

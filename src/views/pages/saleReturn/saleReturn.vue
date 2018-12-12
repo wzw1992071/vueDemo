@@ -202,7 +202,7 @@
             </el-pagination>
         </div>
         <!-- 退货弹出框模板 -->
-        <el-dialog title="添加商品" :visible.sync="dialogFormVisible1" width="80%" @close="cancel" :close-on-click-modal=false>
+        <el-dialog title="退货" :visible.sync="dialogFormVisible1" width="80%" @close="cancel" :close-on-click-modal=false>
           <div class="deleteGood">
                 <el-table
                   :data="returnData"

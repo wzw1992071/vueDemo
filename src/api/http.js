@@ -14,6 +14,7 @@ var axios = Axios.create({
   baseURL: BaseUrl,
   timeout: 30000,
   headers: {
+    Accept: "application/json"
   }
 });
 
@@ -30,7 +31,7 @@ axios.interceptors.request.use(function(config){
     Message.error({
         message:"请求超时"
     })
-  return Promise.reject(error);
+  return new Promise.reject(error);
 });
 //添加一个响应拦截器
 axios.interceptors.response.use(function(res){
@@ -47,10 +48,10 @@ axios.interceptors.response.use(function(res){
   }
   if(res.data.code > 0){
     Message.error({
-        message:"请求失败"
+        message:`请求失败:${res.data.message}`
     })
     console.log(`请求失败:${res.data.message}`)
-    return Promise.reject(error);
+    return new Promise.reject("请求失败");
   }
 
   return res;
@@ -61,7 +62,7 @@ axios.interceptors.response.use(function(res){
     Message.error({
         message:"请求失败"
     })
-  return Promise.reject("请求失败");
+  return new Promise.reject("请求失败");
 })
 
 export default axios

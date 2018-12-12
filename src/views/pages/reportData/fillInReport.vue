@@ -167,6 +167,9 @@ export default {
             if(this.searchParam.explain&&this.searchParam.remark){
                 let sendParam = JSON.parse(JSON.stringify(this.searchParam));
                 sendParam.amount=this.$utils.yuanTofen(sendParam.amount);
+                if(sendParam.voucher.length==0){
+                    delete sendParam.voucher
+                }
                 this.$axios.post("/provider/finance/record/add",sendParam).then(res=>{
                     this.$message({
                         message: '添加成功',

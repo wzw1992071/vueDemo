@@ -32,6 +32,11 @@
                 </div>
             </div>
         </form>   
+        <div class="flex total">
+            <p>共收入<span class="red">{{total.income}}</span>元</p>
+            <p>共支出<span class="red">{{total.expend}}</span>元</p>
+            <p>毛利润<span class="red">{{total.profit}}</span>元</p>
+        </div>
         <div class="tableArea">
             <el-table
                 border
@@ -58,8 +63,14 @@
                     align="center">
                 </el-table-column>
                 <el-table-column
-                    prop="profit"
+                    prop="balance"
                     label="结余"
+                    min-width="80"
+                    align="center">
+                </el-table-column>
+                 <el-table-column
+                    prop="profit"
+                    label="毛利"
                     min-width="80"
                     align="center">
                 </el-table-column>
@@ -161,7 +172,12 @@ export default {
             dataTotal:10,
             tableData:[],
             tableData2:[],
-            dialogVisible:false
+            dialogVisible:false,
+             total:{
+                income:"",
+                expend:"",
+                profit:"",
+            },
         }
     },
     computed: {
@@ -176,20 +192,24 @@ export default {
                 sendParam.end_date=$tools.dateFormat(sendParam.end_date)
                 this.$axios.get('/provider/finance/day-report/list',{params:sendParam})
                 .then(r=>{
-                    this.tableData = r.data.data.goods
+                    this.tableData = r.data.data.lists
                     this.dataTotal = r.data.data.total
+                    this.total.income = r.data.data.income_total/100
+                    this.total.expend = r.data.data.expend_total/100
+                    this.total.profit = r.data.data.profit_total/100
                     this.tableData.forEach((item,index)=>{
                         item.income/=100
                         item.expend/=100
                         item.balance/=100
+                        item.profit/=100
                     })
 
                 })
-                .catch(()=>{
+                .catch((err)=>{
                     this.$message.error({
                         message: '获取数据失败！',
                     });
-                    console.log("获取数据失败！")
+                    console.log(err)
                 })
             }else{
                 this.$message.error({
@@ -274,6 +294,16 @@ export default {
         width:200px;
         height: 200px;
         margin-right: 20px
+    }
+    .total{
+        margin-left: 20px;
+        p{
+            margin-right: 20px;
+            font-size: 20px;
+            .red{
+                color: #f00
+            }
+        }
     }
 }
 </style>

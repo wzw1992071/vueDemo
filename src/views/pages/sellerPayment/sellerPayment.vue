@@ -62,7 +62,7 @@
            
           </div>
             <div class="selecDiv">
-                <span>收款状态：</span>
+                <span>付款状态：</span>
                 <el-select class="" v-model="searchParam.status" name="status" clearable  placeholder="请选择">
                   <el-option
                     v-for="item in selectData.proceeds_status"
@@ -259,7 +259,7 @@ export default {
       },
       // 下拉框选项
       selectData: {
-        proceeds_status: [{ id: 1, name: "未收款" }, { id: 2, name: "已收款" }],
+        proceeds_status: [{ id: 1, name: "未付款" }, { id: 2, name: "已付款" }],
         payPeople: [],
         goods: []
       },

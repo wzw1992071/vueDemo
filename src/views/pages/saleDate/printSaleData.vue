@@ -381,15 +381,23 @@ export default {
               30,
               500,
               100,
-              `配送地址：${printData[j].order.receipt_address}`
+              `地址：${printData[j].order.receipt_address}`
+            );
+            LODOP.SET_PRINT_STYLEA(0, "FontSize", 12); //距离顶部20加字体加间距总高30
+            LODOP.ADD_PRINT_TEXT(
+              nowHeight,
+              350,
+              200,
+              100,
+              `日期：${printData[j].order.purchases_date}`
             );
             LODOP.SET_PRINT_STYLEA(0, "FontSize", 12); //距离顶部20加字体加间距总高30
             LODOP.ADD_PRINT_TEXT(
               nowHeight,
               500,
-              200,
+              300,
               100,
-              `送货日期：${printData[j].order.purchases_date}`
+              `区域：${printData[j].order.receipt_area_code}`
             );
             LODOP.SET_PRINT_STYLEA(0, "FontSize", 12); //距离顶部20加字体加间距总高30
             nowHeight += 30;
@@ -501,7 +509,7 @@ export default {
               250,
               200,
               100,
-              `本单金额：${printData[j].order.total_money / 100}元`
+              `本单金额：${(printData[j].order.total_money / 100).toFixed(1)}元`
             );
             LODOP.SET_PRINT_STYLEA(0, "FontSize", 12);
             LODOP.ADD_PRINT_TEXT(nowHeight, 450, 200, 100, "运费：0元");
@@ -512,7 +520,7 @@ export default {
               30,
               200,
               100,
-              `已收款：${getMoney / 100}元`
+              `已收款：${(getMoney / 100).toFixed(1)}元`
             );
             LODOP.SET_PRINT_STYLEA(0, "FontSize", 12);
             LODOP.ADD_PRINT_TEXT(
@@ -520,7 +528,7 @@ export default {
               250,
               200,
               100,
-              `未收金额：${NogetMoney / 100}元`
+              `未收金额：${(NogetMoney / 100).toFixed(1)}元`
             );
             LODOP.SET_PRINT_STYLEA(0, "FontSize", 12);
             nowHeight += 30;
