@@ -15,14 +15,7 @@
                         placeholder="请选择日期">
                     </el-date-picker>
                     </div>
-                    <!-- <div class="line">至</div>
-                    <div class="block">
-                    <el-date-picker
-                        v-model="searchParam.end_date"
-                        type="date"
-                        placeholder="结束日期">
-                    </el-date-picker>
-                    </div> -->
+                   
                 </div>
             </div>
             <div class="demo-input-suffix">
@@ -145,6 +138,7 @@
               :total="dataTotal">
             </el-pagination>
         </div>
+        
         <el-dialog
           title="提示"
           :visible.sync="dialogVisible"
@@ -158,6 +152,36 @@
           <span slot="footer" class="dialog-footer">
             <el-button @click="dialogVisible = false">取 消</el-button>
             <el-button type="primary" @click="returnGood">确 定</el-button>
+          </span>
+        </el-dialog>
+        <el-dialog
+          title="入库"
+          :visible.sync="dialogVisible2"
+          width="45%"
+          >
+          <div class="flex oneLine" >
+            <div class="flex">
+              <div class="title" style="width:100px;line-height:40px">商品名称：</div>
+              <el-input v-model="returnData2.refund_info[0].title" width="150px"></el-input>
+            </div>
+            <div class="flex">
+              <div class="title" style="width:100px;line-height:40px">数量：</div>
+              <el-input v-model.number="returnData2.refund_info[0].quantity" width="150px"></el-input>
+            </div>
+          </div>
+           <div class="flex oneLine">
+            <div class="flex">
+              <div class="title" style="width:100px;line-height:40px">单位：</div>
+              <el-input v-model="returnData2.refund_info[0].unit" width="150px"></el-input>
+            </div>
+            <div class="flex">
+              <div class="title" style="width:100px;line-height:40px">单价：</div>
+              <el-input v-model="returnData2.refund_info[0].unit_price" width="150px"></el-input>
+            </div>
+          </div>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogVisible2 = false">取 消</el-button>
+            <el-button type="primary" @click="returnWarehouse">确 定</el-button>
           </span>
         </el-dialog>
     </div>
@@ -196,13 +220,20 @@ export default {
       },
       // 表格总数
       dataTotal: 20,
+      dialogVisible:false,
       // 退货弹窗数据
       returnData:{
         type:"",
         goods_no:"",
         amount:0
       },
-      dialogVisible:false
+      // 入库弹窗
+      dialogVisible2:false,
+      // 入库弹窗数据
+      returnData2:{
+        refund_info:[{}]
+      },
+      
     };
   },
   computed: {
@@ -296,7 +327,6 @@ export default {
       results.forEach(function(item, index) {
         a.push({
           value: item.name,
-        
         });
       });
       cb(a);
@@ -305,28 +335,18 @@ export default {
     // 退货订单处理
     returnHandle(item,type){
       if(type==5){
-      //   let sendParam = JSON.parse(
-      //   JSON.stringify(data)
-      // );
-        this.$axios
-        .post("/provider/goods-back/deal-with", {
+        this.returnData2={
           type:5,
           refund_info:[{
             goods_no:item.goods_number,
-            amount:0
+            amount:0,
+            unit:"件",
+            unit_price:item.purchases_price,
+            title:item.goods_name,
+            quantity:item.back_num
           }]
-        }).then(r=>{
-          this.$message({
-            message: "操作成功！",
-            type: "success"
-          });
-          this.search();
-        }).catch(err => {
-          this.$message.error({
-            message: "操作失败！"
-          });
-          console.log(`获取数据失败！+${err}`);
-        });
+        }
+        this.dialogVisible2=true
       }else{
          this.returnData={
           type:1,
@@ -338,6 +358,7 @@ export default {
      
       
     },
+    // 退供应商
     returnGood(){
       if(this.returnData.amount<0) return false;
       let sendParam ={
@@ -361,6 +382,28 @@ export default {
           });
           console.log(`获取数据失败！+${err}`);
         });
+    },
+    // 入库
+    returnWarehouse(){
+      if(this.returnData2.refund_info[0].unit&&this.returnData2.refund_info[0].unit_price>=0&&this.returnData2.refund_info[0].title&&this.returnData2.refund_info[0].quantity>=0){
+        let sendParam = JSON.parse(JSON.stringify(this.returnData2))
+        sendParam.refund_info[0].unit_price = this.$utils.yuanTofen(sendParam.refund_info[0].unit_price)
+         this.$axios
+        .post("/provider/goods-back/deal-with",sendParam).then(r=>{
+          this.$message({
+            message: "操作成功！",
+            type: "success"
+          });
+          this.dialogVisible2=false
+          this.search();
+        })
+      }else{
+        this.$message({
+          message: "请完善数据！",
+          type: "warning"
+        });
+        return false;
+      } 
     },
     pageChange(page){    
       this.searchParam.page = page;
@@ -441,6 +484,16 @@ export default {
       margin: 0 10px 0px;
       padding-bottom: 10px;
       height: 40px;
+    }
+  }
+  .oneLine{
+    margin-bottom: 15px;
+    &>div{
+      width: 48%;
+      margin-right: 2%;
+      .title{
+        text-align: right;
+      }
     }
   }
 }

@@ -5,7 +5,8 @@
     <!-- 本地 -->
      <!-- <form  id="searchForm" action="/api/provider/purchases/sales/export" method="get" target="_blank"> -->
      <!-- 线上版本 -->
-     <form  id="searchForm" :action="formAction" method="get" target="_blank">
+    <form  id="searchForm" :action="formAction" method="get" target="_blank">
+    <!-- <form  id="searchForm2" :action="formAction2" method="get" target="_blank"> -->
       <div class="searchArea">
         <div>
           <div class="block">
@@ -31,6 +32,7 @@
         <div class="demo-input-suffix">
             <span>客户：</span>  
              <el-autocomplete 
+             name= "buyer"
               v-model="searchParam.buyer"
               :fetch-suggestions="queryBuyerName"
               :trigger-on-focus="true"
@@ -49,9 +51,11 @@
             <el-button type="success" icon="el-icon-search" @click="search">确定</el-button>
             <el-button type="danger" icon="el-icon-printer" @click="morePrint">批量打印</el-button>
             <el-button type="primary" icon="el-icon-document" @click="exportMsg">导出</el-button>
+             <el-button type="primary" icon="el-icon-document" @click="exportLogisticsMsg">导出物流单</el-button>
            
         </div>
       </div>
+      <!-- </form> -->
       </form>
       <!-- 搜索按钮 -->
 
@@ -194,19 +198,21 @@ export default {
       // 弹出框订单详情数据
       goodsInfo: [],
       // 复选框中的项
-      multipleSelection: []
+      multipleSelection: [],
+      type:2
     };
   },
   computed: {
     formAction() {
       let url = "";
       if (window.location.hostname == "localhost") {
-        url = "/api/provider/purchases/sales/export";
+        url = (this.type==1)?"/api/provider/purchases/sales/export":"/api/provider/purchases/sales/logistics-bills/export";
       } else {
-        url = "/provider/purchases/sales/export";
+        url = (this.type==1)?"/provider/purchases/sales/export":"/provider/purchases/sales/logistics-bills/export";
       }
       return url;
-    }
+    },
+  
   },
   methods: {
     // 请求页面数据
@@ -354,7 +360,7 @@ export default {
             LODOP.ADD_PRINT_TEXT(
               nowHeight,
               30,
-              200,
+              230,
               100,
               `客户名称：${printData[j].order.buyer_shop_name}`
             );
@@ -369,8 +375,8 @@ export default {
             LODOP.SET_PRINT_STYLEA(0, "FontSize", 12); //距离顶部20加字体加间距总高30
             LODOP.ADD_PRINT_TEXT(
               nowHeight,
-              500,
-              250,
+              480,
+              300,
               100,
               `编号：${printData[j].order.order_no}`
             );
@@ -379,7 +385,7 @@ export default {
             LODOP.ADD_PRINT_TEXT(
               nowHeight,
               30,
-              500,
+              320,
               100,
               `地址：${printData[j].order.receipt_address}`
             );
@@ -404,7 +410,7 @@ export default {
             var tableMain = `
             <style> 
               table,td,th {border-width: 1px;border-style: solid;border-collapse: collapse;text-align:center}
-             td{height:50px;font-size:10px}
+             td{height:50px;font-size:14px}
             </style>
             <table style="border-collapse:collapse">
               <tr><td width="20%">品名</td><td width="4%">数量</td><td width="4%">单价</td><td width="4%">合计</td><td width="4%">单位</td></tr>`;
@@ -577,14 +583,51 @@ export default {
     // 导出功能
     exportMsg() {
       if (this.searchParam.start_date && this.searchParam.end_date) {
-        this.$el.querySelector("#searchForm").submit();
+        this.type=1;
+        this.$nextTick(()=>{
+           this.$el.querySelector("#searchForm").submit();
+        })
       } else {
         this.$message({
           message: "请选择导出日期！",
           type: "warning"
         });
       }
-    }
+    },
+     // 导出物流单
+    exportLogisticsMsg(){
+      if (this.searchParam.start_date && this.searchParam.end_date) {
+        this.type=2;
+        this.$nextTick(()=>{
+           this.$el.querySelector("#searchForm").submit();
+        })
+      } else {
+        this.$message({
+          message: "请选择导出日期！",
+          type: "warning"
+        });
+      }
+      // if(this.searchParam.start_date&&this.searchParam.end_date){
+      //   let sendParam = JSON.parse(JSON.stringify(this.searchParam));
+      //   for (var i in sendParam) {
+      //     if (!sendParam[i]) {
+      //       delete sendParam[i];
+      //     }else if(sendParam[i].length==0) {
+      //       delete sendParam[i];
+      //     }
+      //   }  
+      //   delete sendParam["page"];
+      //   delete sendParam["size"];
+      //   sendParam.start_date = $tools.dateFormat(sendParam.start_date);
+      //   sendParam.end_date = $tools.dateFormat(sendParam.end_date);
+      //   this.$axios.get("/provider/purchases/sales/logistics-bills/export",{params:sendParam})
+      // }else{
+      //   that.$message.error({
+      //     message: "请选择日期！"
+      //   });
+      // }
+     
+    },
   },
   created() {
     this.search();

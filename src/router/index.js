@@ -91,6 +91,16 @@ export default new Router({
           path: 'fillInReport',
           component: _import('pages/reportData/fillInReport')
         },
+        // 库存列表
+        {
+          path: 'stockList',
+          component: _import('pages/stockManage/stockList')
+        },
+        // 测试页面
+        {
+          path: 'test',
+          component: _import('pages/test/test')
+        },
       ]
       
     }

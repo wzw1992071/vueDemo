@@ -107,6 +107,7 @@
             <el-button type="primary" icon="el-icon-edit" @click="moreEdit">批量修改</el-button>
             <el-button type="primary" icon="el-icon-edit" @click="moreCallGoods">批量叫货</el-button>
             <el-button type="primary" icon="el-icon-document" @click="exportMsg">导出</el-button>
+           
             
           </div>
         </div>
@@ -794,6 +795,7 @@ export default {
         });
       }
     },
+   
     // 供应商修改提交
     changeSeller() {
       var that = this;

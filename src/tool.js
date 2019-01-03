@@ -55,7 +55,7 @@
     $tools.createFilter=function(queryString, type) {
         return restaurant => {
             return (
-            restaurant[type].toLowerCase().indexOf(queryString.toLowerCase()) ===
+            restaurant[type].toLowerCase().indexOf(queryString.toLowerCase()) >=
             0
             );
         };

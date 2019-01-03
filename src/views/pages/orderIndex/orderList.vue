@@ -138,7 +138,7 @@
           </el-pagination>
       </div>
       <!-- 订单添加商品 -->
-      <el-dialog title="添加商品" :visible.sync="dialogFormVisible1" width="80%" :close-on-click-modal=false>
+      <el-dialog title="添加商品" :visible.sync="dialogFormVisible1" width="85%" :close-on-click-modal=false>
         <div class="addGoodsForm">
             <el-button @click="addOneGood" type="text">添加商品</el-button>
               <el-table
@@ -162,6 +162,15 @@
                       >
                       </el-autocomplete>
                       <!-- <el-input v-model="scope.row.goods_name"></el-input> -->
+                    </template>
+                </el-table-column>
+                 <el-table-column
+                  prop="original_price"
+                  label="进价"
+                  min-width="80"
+                  align="center">
+                    <template slot-scope="scope">
+                      <el-input v-model.number="scope.row.original_price"></el-input>
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -235,7 +244,7 @@
         </div>
       </el-dialog>
       <!-- 添加订单 -->
-      <el-dialog title="添加订单" :visible.sync="dialogFormVisible2" width="80%" :close-on-click-modal=false>
+      <el-dialog title="添加订单" :visible.sync="dialogFormVisible2" width="85%" :close-on-click-modal=false>
         <div class="addGoodsForm">
           <el-form :model="addOrderInfo.order" :rules="rules" label-width="120px" ref="orderForm">
             <el-row>
@@ -377,6 +386,15 @@
                       >
                       </el-autocomplete>
                       <!-- <el-input v-model="scope.row.goods_name"></el-input> -->
+                    </template>
+                </el-table-column>
+                 <el-table-column
+                  prop="original_price"
+                  label="进价"
+                  min-width="80"
+                  align="center">
+                    <template slot-scope="scope">
+                      <el-input v-model.number="scope.row.original_price"></el-input>
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -894,12 +912,12 @@ export default {
     querySearchName(queryString, cb) {
       let restaurants = this.allShopInfo;
       let results = queryString
-        ? restaurants.filter(this.createFilter(queryString, "shop_name"))
+        ? restaurants.filter($tools.createFilter(queryString, "shop_name"))
         : restaurants;
       let a = [];
       results.forEach(function(item, index) {
         a.push({
-          value: item.shop_name,
+          value: `${item.shop_name} ${item.mobile_phone}`,
           tel: item.mobile_phone,
           id: item.id,
           province_id: item.province_id,
@@ -936,7 +954,7 @@ export default {
     querySearchTel(queryString, cb) {
       let restaurants = this.allShopInfo;
       let results = queryString
-        ? restaurants.filter(this.createFilter(queryString, "mobile_phone"))
+        ? restaurants.filter($tools.createFilter(queryString, "mobile_phone"))
         : restaurants;
       let a = [];
       results.forEach(function(item, index) {
@@ -985,7 +1003,7 @@ export default {
     querySearchAddress(queryString, cb) {
       let restaurants = this.shopAddressList;
       let results = queryString
-        ? restaurants.filter(this.createFilter(queryString, "full_address"))
+        ? restaurants.filter($tools.createFilter(queryString, "full_address"))
         : restaurants;
       let a = [];
       results.forEach(function(item, index) {
@@ -1006,7 +1024,7 @@ export default {
     querySearchGoods(queryString, cb) {
       let restaurants = this.allGoodsList;
       let results = queryString
-        ? restaurants.filter(this.createFilter(queryString, "goods_name"))
+        ? restaurants.filter($tools.createFilter(queryString, "goods_name"))
         : restaurants;
       let a = [];
       results.forEach(function(item, index) {
@@ -1053,7 +1071,7 @@ export default {
     createFilter(queryString, type) {
       return restaurant => {
         return (
-          restaurant[type].toLowerCase().indexOf(queryString.toLowerCase()) ===
+          restaurant[type].toLowerCase().indexOf(queryString.toLowerCase()) >=
           0
         );
       };
