@@ -1,8 +1,8 @@
 
-import { create } from 'domain';
+
 <template>
   <div class="mainBox">
-    <el-input  v-model="inputValue" @change="selectData" @focus="toggerTig(true)" ></el-input>
+    <el-input  v-model="inputValue"  @focus="toggerTig(true)" ></el-input>
     <div class="PromptBox" v-if="PromptShow">
       <div class="PromptHead">
         <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
@@ -13,7 +13,7 @@ import { create } from 'domain';
       </div>
 
       <el-checkbox-group v-model="choiceData" @change="handleCheckedCitiesChange">
-        <el-checkbox v-for="item in selectInfo" :label="item.id" :key="item.id">{{item.name}}</el-checkbox>
+        <el-checkbox v-for="item in selectInfo" :label="item.value" :key="item.value">{{item.label}}</el-checkbox>
       </el-checkbox-group>
     </div>
 
@@ -26,45 +26,67 @@ export default {
   props: ['info'],
   data () {
     return {
-      checkAll: false,
+      checkAll: true,
       PromptShow:false,
       inputValue:"",
       choiceData:[],//多选选中数据
-      isIndeterminate: false,//是否全选
+      // isIndeterminate: true,
+      // 传入选项
       selectAllInfo:[
-        {name:"小明",id:1},{name:"张红",id:2},{name:"小兰",id:3}
+        {label:"小明",value:1},{label:"张红",value:2},{label:"小兰",value:3}
       ],
-      AllCheckedData:[1,2,3],//全选的数据
-      selectInfo:[]
+       // 选项
+      selectInfo:[],
+      // AllCheckedData:[],//全选的数据
+     
+    }
+  },
+  computed: {
+    // 全选的数据value
+    AllCheckedData(){
+      let Arr = []
+      this.selectInfo.forEach(item=>{
+        Arr.push(item.value)
+      })
+      return Arr;
+    },
+     //是否半选
+    isIndeterminate(){
+      // if(){
+
+      // }
     }
   },
   watch:{
     inputValue(val, oldVal){
       this.selectData()
-    }
+    },
+   
+
   },
   methods:{
     toggerTig(flage){
       this.PromptShow=flage
     },
     handleCheckAllChange(val){
-      this.choiceData = val ? this.AllCheckedData : [];
-      this.isIndeterminate = false;
+      // this.choiceData = val ? this.AllCheckedData : [];
+      // this.isIndeterminate = false;
     },
     handleCheckedCitiesChange(value){
-      let checkedCount = value.length;
-      this.checkAll = checkedCount === this.selectAllInfo.length;
-      this.isIndeterminate = checkedCount > 0 && checkedCount < this.selectAllInfo.length;
+      // let checkedCount = value.length;
+      // this.checkAll = checkedCount === this.selectAllInfo.length;
+      // this.isIndeterminate = checkedCount > 0 && checkedCount < this.selectAllInfo.length;
     },
     selectData(){
-      var newArr=[]
+      
+      // console.log(_.find(this.selectAllInfo, (item)=>{ 
+      //   return item.label.indexOf(this.inputValue)>-1
+      // }))
+     let newArr=[]
       var newArr2=[]
       this.selectAllInfo.forEach(item => {
-        if(item.name.indexOf(this.inputValue)>-1){
-          newArr.push(item)
-          newArr2.push(item.id)
-          this.AllCheckedData=newArr2
-         
+        if(item.label.indexOf(this.inputValue)>-1){
+          newArr.push(item)       
         }
       });
       this.selectInfo = newArr;
@@ -72,9 +94,10 @@ export default {
 
   },
   created(){
-    // console.log(this.info)
-    // this.selectData()
+    // // console.log(this.info)
+    // // this.selectData()
     this.selectInfo = this.selectAllInfo;
+    // console.log(_)
   }
 }
 </script>
