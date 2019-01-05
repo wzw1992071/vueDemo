@@ -5,7 +5,7 @@ import App from './App'
 import router from './router'
 import store from "src/vuex/store"
 import axios from "src/api/http"
-
+import MoreChoice from "src/views/components/moreChoice"
 
 //初始化css样式
 import "src/assets/css/normalize.css"
@@ -27,6 +27,9 @@ Vue.config.productionTip = false
 
 // 引入封装过的axios
 Vue.prototype.$axios = axios
+
+// 全局注册组件
+Vue.component('MoreChoice',MoreChoice)
 
 /* eslint-disable no-new */
 new Vue({

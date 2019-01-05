@@ -52,7 +52,7 @@
           </div>
           <div class="demo-input-suffix">
             <span>商品名：</span> 
-             <el-select
+             <!-- <el-select
               v-model="searchParam.goods_name"
               style="width: 350px;"
               filterable
@@ -64,7 +64,8 @@
                 :label="item.value"
                 :value="item.value">
               </el-option>
-            </el-select> 
+            </el-select>  -->
+            <MoreChoice @endChoice="v=>endChoice(v,searchParam)" :selectAllInfo="selectData.goods" ></MoreChoice>
             <!-- <el-input v-model="searchParam.goods_name" name="goods_name"></el-input> -->
           </div>
         </div>
@@ -114,6 +115,7 @@
         <!-- 搜索按钮 -->
      
       </form>
+      
        <!-- 表单 -->
       <div class="tableArea">
         <el-table
@@ -481,6 +483,14 @@ export default {
     }
   },
   methods: {
+    // 多选组件选中
+    endChoice(v,i){
+      // console.log(v)
+      // console.log(i)
+      i.goods_name=v
+      
+      // i.goods_name=["1"]
+    },
     // 请求页面数据
     search() {
       var that = this;
@@ -574,7 +584,8 @@ export default {
             })
             res.data.data.goods.forEach((item,index)=>{
               this.selectData.goods.push({
-                value:item
+                value:item,
+                label:item
               })
             })
           })
@@ -885,6 +896,11 @@ export default {
   background: #fff;
   #searchForm {
     border-bottom: 1px solid #ccc;
+    .demo-input-suffix{
+      &>div{
+        width: 200px;
+      }
+    }
     & > div {
       height: 40px;
       span {
