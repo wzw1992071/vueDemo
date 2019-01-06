@@ -30,7 +30,8 @@
 export default {
   name: 'MoreChoice',
   props: {
-    selectAllInfo: Array
+    selectAllInfo: Array,
+    value,
   },
   data () {
     return {

@@ -65,7 +65,7 @@
                 :value="item.value">
               </el-option>
             </el-select>  -->
-            <MoreChoice @endChoice="v=>endChoice(v,searchParam)" :selectAllInfo="selectData.goods" ></MoreChoice>
+            <!-- <MoreChoice @endChoice="v=>endChoice(v,searchParam)" :selectAllInfo="selectData.goods" ></MoreChoice> -->
             <!-- <el-input v-model="searchParam.goods_name" name="goods_name"></el-input> -->
           </div>
         </div>
