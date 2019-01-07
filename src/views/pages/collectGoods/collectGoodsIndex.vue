@@ -45,7 +45,7 @@
             <span>商品名：</span>  
             <el-input v-model="searchParam.goods_name"></el-input>
           </div> -->
-          <div class="demo-input-suffix">
+          <!-- <div class="demo-input-suffix">
             <span>商品名：</span> 
              <el-select
               v-model="searchParam.goods_name"
@@ -61,7 +61,10 @@
                 :value="item.value">
               </el-option>
             </el-select> 
-            <!-- <el-input v-model="searchParam.goods_name" name="goods_name"></el-input> -->
+          </div> -->
+          <div class="demo-input-suffix">
+            <span>商品名：</span> 
+            <MoreChoice v-model="searchParam.goods_name"  :selectAllInfo="selectData.goods" ></MoreChoice>
           </div>
         </div>
         <div class="searchArea">
@@ -285,7 +288,7 @@ export default {
         start_date:new Date(),//开始时间
         end_date:new Date(),//结束时间
         seller:'',//供应商信息 
-        goods_name:'',//商品名
+        goods_name:[],//商品名
         buyer:"", //买家信息 
         page:'1',//当前页
         size:'50',//每页数量
@@ -383,7 +386,8 @@ export default {
             })
             res.data.data.goods.forEach((item,index)=>{
               this.selectData.goods.push({
-                value:item
+                value:item,
+                label:item
               })
             })
           })
@@ -701,6 +705,15 @@ export default {
   .mainBox{
     height: 100%;
     background: #fff;
+    // #searchForm{
+    //    & > div {
+    //       height: 40px;
+    //       span {
+    //         height: 40px;
+    //       }
+    //    }
+    // }
+    
     .searchBox{
       border-bottom: 1px solid #ccc;
       .searchArea{
@@ -708,7 +721,12 @@ export default {
         padding: 5px 0;
         display: flex;
         justify-content: flex-start;
-        
+        .demo-input-suffix{
+          height: 42px;
+          &>div{
+            width: 200px;
+          }
+        }
         &>div{
           margin-left: 10px;
           display: flex;

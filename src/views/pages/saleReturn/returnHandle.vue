@@ -20,21 +20,7 @@
             </div>
             <div class="demo-input-suffix">
               <span>商品名：</span> 
-              <el-select
-                v-model="searchParam.goods_name"
-                style="width: 350px;"
-                name="goods_name"
-                filterable
-                multiple
-                collapse-tags>
-                <el-option
-                  v-for="item in selectData.goods"
-                  :key="item.value"
-                  :label="item.value"
-                  :value="item.value">
-                </el-option>
-              </el-select> 
-              <!-- <el-input v-model="searchParam.goods_name" name="goods_name"></el-input> -->
+              <MoreChoice v-model="searchParam.goods_name"  :selectAllInfo="selectData.goods" ></MoreChoice>
             </div>
             <div class="demo-input-suffix">
               <span>供应商：</span>  
@@ -197,7 +183,7 @@ export default {
         back_date: new Date(), //退货时间
         page: 1, //当前页
         size: 50, //每页数量
-        goods_name: "", //商品名
+        goods_name: [], //商品名
         seller: "" //供应商
       },
       // 输入提示内容
@@ -305,7 +291,8 @@ export default {
             })
             res.data.data.goods.forEach((item,index)=>{
               this.selectData.goods.push({
-                value:item
+                value:item,
+                label:item
               })
             })
           })
@@ -433,7 +420,7 @@ export default {
         height: 50px;
       }
       div {
-        height: 50px;
+        // height: 50px;
         &.btnGuoup {
           display: flex;
           justify-content: flex-end;
@@ -450,6 +437,12 @@ export default {
     display: flex;
     height: 50px !important;
     justify-content: flex-start;
+    .demo-input-suffix{
+          height: 42px;
+          &>div{
+            width: 200px;
+          }
+        }
     .el-date-editor.el-input {
       width: 160px;
     }

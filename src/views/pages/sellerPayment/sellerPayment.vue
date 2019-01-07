@@ -3,7 +3,7 @@
     <div class="mainBox">
       <form  id="searchForm" :action="formAction" method="get" target="_blank">
         <div class="searchArea">
-              <div class="demo-input-suffix">
+              <div >
                 <span>订单日期：</span>  
                 <div class="timeArea">
                     <div class="block">
@@ -43,7 +43,7 @@
                 <span>商品名：</span>  
                 <el-input v-model="searchParam.goods_name" ></el-input>
             </div> -->
-            <div class="demo-input-suffix">
+            <!-- <div class="demo-input-suffix">
             <span>商品名：</span> 
              <el-select
               v-model="searchParam.goods_name"
@@ -60,7 +60,11 @@
               </el-option>
             </el-select> 
            
-          </div>
+          </div> -->
+           <div class="demo-input-suffix">
+              <span>商品名：</span> 
+              <MoreChoice v-model="searchParam.goods_name"  :selectAllInfo="selectData.goods" ></MoreChoice>
+            </div>
             <div class="selecDiv">
                 <span>付款状态：</span>
                 <el-select class="" v-model="searchParam.status" name="status" clearable  placeholder="请选择">
@@ -74,7 +78,7 @@
             </div>
         </div>
         <div class="searchArea">
-            <div class="demo-input-suffix">
+            <div class="">
                 <span>收款时间：</span>  
                 <div class="timeArea">
                     <div class="block">
@@ -96,7 +100,7 @@
                     </div>
                 </div>
             </div>
-            <div class="selecDiv">
+            <div class="selecDiv ">
                 <span>付款人：</span>
                 <el-select class="" name="payer" v-model="searchParam.payer" clearable  placeholder="请选择">
                   <el-option
@@ -247,7 +251,7 @@ export default {
         pay_start_date: "", //付款开始时间
         pay_end_date: "", //付款结束时间
         seller: "", //采购商信息
-        goods_name: "", //商品名
+        goods_name: [], //商品名
         status: "", //付款状态
         payer: "", //付款者
         page: 1, //当前页
@@ -342,7 +346,8 @@ export default {
             });
             res.data.data.goods.forEach((item, index) => {
               this.selectData.goods.push({
-                value: item
+                value:item,
+                label:item
               });
             });
           })
@@ -542,6 +547,12 @@ export default {
     display: flex;
     height: 50px !important;
     justify-content: flex-start;
+    .demo-input-suffix{
+          height: 42px;
+          &>div{
+            width: 200px;
+          }
+        }
     .el-date-editor.el-input {
       width: 160px;
     }

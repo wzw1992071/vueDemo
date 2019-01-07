@@ -31,7 +31,11 @@ export default {
   name: 'MoreChoice',
   props: {
     selectAllInfo: Array,
-    value,
+    defaultChoiceData: Array,
+  },
+  model: {
+      prop: 'defaultChoiceData',
+      event: 'changeData'
   },
   data () {
     return {
@@ -89,6 +93,7 @@ export default {
       this.PromptShow=flag;
       if(flag){
         this.selectInfo = this.selectAllInfo;
+        this.selectData();
       }
     },
     handleCheckAllChange(val){
@@ -100,25 +105,30 @@ export default {
     },
     // 帅选功能
     selectData(){
-     let newArr=[]
-      var newArr2=[]
+      // console.log(1)
+      let newArr=[]
       this.selectAllInfo.forEach(item => {
-        if(item.label.indexOf(this.inputValue)>-1){
-          newArr.push(item)       
+        try {
+          if(item.label.indexOf(this.inputValue)>-1){
+            newArr.push(item)       
+          }
+        } catch (error) {
+          console.log(error)
         }
+        
       });
       this.selectInfo = newArr;
     },
     // 提交数据
     submitData(){
-      
-      this.$emit("endChoice",this.choiceData);
+      this.$emit("changeData",this.choiceData);
       this.toggerTig(false)
     }
 
   },
   mounted(){
-    // console.log(1)
+    this.choiceData = this.defaultChoiceData;
+    
     
   }
 }
@@ -130,14 +140,16 @@ export default {
     position: relative;
     z-index: 999;
     width:100%;
-
+    .el-input{
+      position: absolute;
+    }
     .selectNumber{
       height: 20px;
       color: #909399;
       font-size: 16px;
     }
     .PromptBox{
-        max-width: 100%;
+        width: 100%;
         color: #606266;
         border: 1px solid #e4e7ed;
         box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
@@ -145,7 +157,8 @@ export default {
         border-radius: 4px;
         line-height: 30px;
         margin: 5px 0;
-       
+        position: absolute;
+        margin-top: 43px;
     }
     .PromptHead{
       margin-top: 3px;

@@ -65,7 +65,7 @@
                 :value="item.value">
               </el-option>
             </el-select>  -->
-            <!-- <MoreChoice @endChoice="v=>endChoice(v,searchParam)" :selectAllInfo="selectData.goods" ></MoreChoice> -->
+            <MoreChoice v-model="searchParam.goods_name"  :selectAllInfo="selectData.goods" ></MoreChoice>
             <!-- <el-input v-model="searchParam.goods_name" name="goods_name"></el-input> -->
           </div>
         </div>
@@ -483,14 +483,6 @@ export default {
     }
   },
   methods: {
-    // 多选组件选中
-    endChoice(v,i){
-      // console.log(v)
-      // console.log(i)
-      i.goods_name=v
-      
-      // i.goods_name=["1"]
-    },
     // 请求页面数据
     search() {
       var that = this;
