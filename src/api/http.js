@@ -14,7 +14,8 @@ var axios = Axios.create({
   baseURL: BaseUrl,
   timeout: 30000,
   headers: {
-    Accept: "application/json"
+    Accept: "application/json",
+    // "Access-Control-Allow-Origin": *
   }
 });
 

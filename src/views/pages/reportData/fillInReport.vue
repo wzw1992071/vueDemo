@@ -135,27 +135,34 @@ export default {
                         fd.append('OSSAccessKeyId', access_id);
                         fd.append('policy', policyBase64);  //参与签名的头信息;
                         fd.append('signature', signature);  //签名;
+                        fd.append('success_action_status', "200");
                         fd.append('file', url);  //需上传的文件对像;
-                        var xhr = new XMLHttpRequest();
-                        xhr.addEventListener('load', () => {
-                            let param = this.props.param;
-                            param.type_pic_url = key;
-                            this.props.setParam(param);
-                        }, false);
-                        //请求中断
-                        xhr.addEventListener('abort', ()=> {
-                            this.$message.error({
-                                message: "上传中断，请检查网络后重新上传"
-                            });
-                        }, false);
-                        //发送请求
-                        xhr.open('POST', 'http://oss-cn-qingdao.aliyuncs.com/idongpin', true);
-                        xhr.send(fd);
-                        xhr.onreadystatechange=()=>{
-                            if(xhr.readyState == 4){
-                                this.searchParam.voucher.push(key)
-                            }
-                        }
+                        // var xhr = new XMLHttpRequest();
+                        // xhr.addEventListener('load', () => {
+                        //     let param = this.props.param;
+                        //     param.type_pic_url = key;
+                        //     this.props.setParam(param);
+                        // }, false);
+                        // //请求中断
+                        // xhr.addEventListener('abort', ()=> {
+                        //     this.$message.error({
+                        //         message: "上传中断，请检查网络后重新上传"
+                        //     });
+                        // }, false);
+                        // //发送请求
+                        // xhr.open('POST', 'http://oss-cn-qingdao.aliyuncs.com/idongpin', true);
+                        // xhr.send(fd);
+                        // xhr.onreadystatechange=()=>{
+                        //     if(xhr.readyState == 4){
+                        //         this.searchParam.voucher.push(key)
+                        //     }
+                        // }
+                        this.$fileAxios.post('http://oss-cn-qingdao.aliyuncs.com/idongpin',fd).then(res=>{
+                           console.log(res)
+                           this.searchParam.voucher.push(key)
+                        },err=>{
+                            console.log(2)
+                        })
                  })
             })
 
