@@ -245,7 +245,7 @@
       </el-dialog>
       <!-- 添加订单 -->
       <el-dialog title="添加订单" :visible.sync="dialogFormVisible2" width="85%" :close-on-click-modal=false>
-        <div class="addGoodsForm">
+        <div class="addGoodsForm" v-if="addOrderInfo.order">
           <el-form :model="addOrderInfo.order" :rules="rules" label-width="120px" ref="orderForm">
             <el-row>
                 <el-col :span="8">
@@ -538,18 +538,17 @@ export default {
       // 当前输入行
       changeRowIndex: 0,
       // 添加订单信息
+      defaultInfo: {},
       addOrderInfo: {
         order: {
           buyer_shop_name: "", //采购商店铺名
           buyer_tel: "", //采购商联系电话
           receipt_address: "", //收货地址
-          freight: "", //商品运费
+          freight: "0", //商品运费
           pay_mode: "1", //支付模式
           province_id: "", //买家所在省ID
           city_id: "", //	买家所在市ID
           county_id: "", //买家所在区县ID
-          // receipt_area: "", //配送区域 如：金牛区
-          // receipt_area_code: "", //配送区域代号 如：Y_1
           consign_date: ""
         },
         goods: []
@@ -579,7 +578,7 @@ export default {
         ],
         county_id: [
           { required: true, message: "买家所在区县不能为空!", trigger: "blur" }
-        ],
+        ]
         // receipt_area_code: [
         //   { required: true, message: "配送区域不能为空!", trigger: "blur" },
         //   { min: 1, max: 5, message: "请输入正确的配送区域！", trigger: "blur" }
@@ -637,6 +636,7 @@ export default {
       this.addGoodsInfo.order = row.order_no;
       this.addGoodsInfo.goods = [];
       this.addGoodsInfo.goods.push(JSON.parse(JSON.stringify(this.goodsDemo)));
+
       this.dialogFormVisible1 = true;
     },
     // 添加商品中增加一个商品
@@ -671,20 +671,15 @@ export default {
     // 添加商品中计算总价
     sumMoney2(i) {
       // console.log(i)
-      this.addGoodsInfo.goods[i].totalMoney =
-        (this.addGoodsInfo.goods[i].goods_sell_price *
-        this.addGoodsInfo.goods[i].buy_num).toFixed(2);
+      this.addGoodsInfo.goods[i].totalMoney = (
+        this.addGoodsInfo.goods[i].goods_sell_price *
+        this.addGoodsInfo.goods[i].buy_num
+      ).toFixed(2);
     },
     // 提交增加商品
     submitAddGoods() {
       let flag = true;
       let that = this;
-      // this.$refs.Goodform.forEach(function(value,i){
-      //   let a = value.validateForm()
-      //   if(!a){
-      //     flag=false
-      //   }
-      // })
       if (flag) {
         this.addGoodsInfo.goods.forEach((value, i) => {
           value.goods_sell_price = this.$utils.yuanTofen(
@@ -732,29 +727,34 @@ export default {
     },
     // 添加订单
     addOrder() {
-     
       this.dialogFormVisible2 = true;
-      if(this.$refs.orderForm){
-        this.$refs.orderForm.resetFields()
+      if (this.$refs.orderForm) {
+        this.$refs.orderForm.resetFields();
       }
-       
       this.openTime = new Date().getTime();
-      this.addOrderInfo = {
+      this.addOrderInfo={
         order: {
-          buyer_shop_name: "",
-          buyer_tel: "",
-          receipt_address: "",
-          freight: 0,
-          pay_mode: "1",
-          province_id: "",
-          city_id: "",
-          county_id: "",
-          // receipt_area: "",
-          // receipt_area_code: "",
+          buyer_shop_name: "", //采购商店铺名
+          buyer_tel: "", //采购商联系电话
+          receipt_address: "", //收货地址
+          freight: "0", //商品运费
+          pay_mode: "1", //支付模式
+          province_id: this.defaultInfo.province_id, //买家所在省ID
+          city_id: this.defaultInfo.city_id, //	买家所在市ID
+          county_id: "", //买家所在区县ID
           consign_date: new Date()
         },
         goods: []
-      };
+      }
+      // defaultInfo
+      if(this.defaultInfo.province_id){
+        this.provinceChange()
+      }
+      if(this.defaultInfo.city_id){
+        this.addOrderInfo.order.city_id=this.defaultInfo.city_id;
+        this.cityChange()
+      }
+      this.addOrderInfo.goods = [];
       this.addOrderInfo.goods.push(JSON.parse(JSON.stringify(this.goodsDemo)));
     },
     // 订单添加一个商品
@@ -929,7 +929,7 @@ export default {
     },
     handleSelectName(value) {
       this.addOrderInfo.order.buyer_tel = value.tel;
-      this.$refs.orderForm.validateField('buyer_shop_name');
+      this.$refs.orderForm.validateField("buyer_shop_name");
       this.$axios
         .get("/custom/address/lists", {
           params: { id: value.id }
@@ -1062,68 +1062,81 @@ export default {
     },
     // 计算总价
     sumMoney(i) {
-      this.addOrderInfo.goods[i].totalMoney =
-        (this.addOrderInfo.goods[i].goods_sell_price *
-        this.addOrderInfo.goods[i].buy_num).toFixed(2);
+      this.addOrderInfo.goods[i].totalMoney = (
+        this.addOrderInfo.goods[i].goods_sell_price *
+        this.addOrderInfo.goods[i].buy_num
+      ).toFixed(2);
     },
 
     // 匹配规则
     createFilter(queryString, type) {
       return restaurant => {
         return (
-          restaurant[type].toLowerCase().indexOf(queryString.toLowerCase()) >=
-          0
+          restaurant[type].toLowerCase().indexOf(queryString.toLowerCase()) >= 0
         );
       };
+    },
+    initData() {
+      let that = this;
+      let a = that.$axios.get("/provider/payments");
+      let b = that.$axios.get("/api/other/provinces");
+      let c = that.$axios.get("/custom/lists/all");
+      Promise.all([a, b, c])
+        .then(function(r) {
+          // 获取省份ID
+          r[1].data.data.forEach(item => {
+            that.selectOptions.province_id.push({
+              value: item.id,
+              label: item.name
+            });
+          });
+          // 获取支付方式
+          for (let i in r[0].data.data) {
+            that.selectOptions.pay_mode.push({
+              value: i,
+              label: r[0].data.data[i]
+            });
+          }
+          that.allShopInfo = r[2].data.data;
+          // console.log(r[2].data.data)
+          that.search();
+        })
+        .catch(function(err) {
+          console.log(err);
+          that.$message.error({
+            message: "获取生成订单信息失败！"
+          });
+        });
+      that.$axios
+        .get("/provider/species/order/goods", {
+          params: {
+            start_date: $tools.dateFormat(new Date()),
+            end_date: $tools.dateFormat(new Date())
+          }
+        })
+        .then(function(r) {
+          that.allGoodsList = r.data.data;
+        })
+        .catch(function(err) {
+          console.log(err);
+          that.$message.error({
+            message: "获取添加商品列表失败！"
+          });
+        });
+      this.$axios.get("/provider/allocation/order/add/default/").then(res => {
+        if (res.status == 200) {
+          this.defaultInfo.city_id = res.data.city_id;
+          this.defaultInfo.province_id = res.data.province_id;
+          this.defaultInfo.seller_tel = res.data.sell_tel;
+          this.defaultInfo.sell_unit = res.data.goods_unit;
+          this.goodsDemo.seller_tel=res.data.sell_tel;
+          this.goodsDemo.sell_unit=res.data.goods_unit;
+        }
+      });
     }
   },
   created() {
-    let that = this;
-    let a = that.$axios.get("/provider/payments");
-    let b = that.$axios.get("/api/other/provinces");
-    let c = that.$axios.get("/custom/lists/all");
-    Promise.all([a, b, c])
-      .then(function(r) {
-        // 获取省份ID
-        r[1].data.data.forEach(item => {
-          that.selectOptions.province_id.push({
-            value: item.id,
-            label: item.name
-          });
-        });
-        // 获取支付方式
-        for (let i in r[0].data.data) {
-          that.selectOptions.pay_mode.push({
-            value: i,
-            label: r[0].data.data[i]
-          });
-        }
-        that.allShopInfo = r[2].data.data;
-        // console.log(r[2].data.data)
-        that.search();
-      })
-      .catch(function(err) {
-        console.log(err);
-        that.$message.error({
-          message: "获取生成订单信息失败！"
-        });
-      });
-    that.$axios
-      .get("/provider/species/order/goods", {
-        params: {
-          start_date: $tools.dateFormat3m(new Date()),
-          end_date: $tools.dateFormat(new Date())
-        }
-      })
-      .then(function(r) {
-        that.allGoodsList = r.data.data;
-      })
-      .catch(function(err) {
-        console.log(err);
-        that.$message.error({
-          message: "获取添加商品列表失败！"
-        });
-      });
+    this.initData();
   }
 };
 </script>
