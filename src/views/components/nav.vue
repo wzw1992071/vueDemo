@@ -96,6 +96,14 @@ export default {
                         {index:"9-1",  name:"库存列表" ,path:"/stockList"},
                        
                     ]
+                },
+                 { 
+                    index:"10",  
+                    name:"订单地图",
+                    childs:[
+                        {index:"10-1",  name:"订单地图" ,path:"/orderShow"},
+                       
+                    ]
                 }
         ]
     }

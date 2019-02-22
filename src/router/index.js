@@ -96,6 +96,11 @@ export default new Router({
           path: 'stockList',
           component: _import('pages/stockManage/stockList')
         },
+        // 订单地图显示
+        {
+          path: 'orderShow',
+          component: _import('pages/orderShow/orderShow')
+        },
         // 测试页面
         {
           path: 'test',
